@@ -10,7 +10,7 @@ description = "Run the contrast gate only (no files written)"
 run = "deno task check"
 
 [tasks.sync]
-description = "Copy dist/ and fonts/ into the sibling consumer repos (../zentinelproxy.io, ../zentinelproxy.io-docs)"
+description = "Copy dist/ and fonts/ into the consumer repos checked out next to this one (--check: report drift; --root <dir>: look elsewhere)"
 run = "deno task sync"
 
 [tasks.marks]

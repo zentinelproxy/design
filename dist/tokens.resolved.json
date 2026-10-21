@@ -162,6 +162,26 @@
       "shadow-rgb": "54 18 46"
     }
   },
+  "derived": {
+    "dark": {
+      "bg-rgb": "22 13 21",
+      "surface-rgb": "31 22 30",
+      "surface-raised-rgb": "42 31 40",
+      "text-rgb": "243 237 242",
+      "accent-rgb": "246 141 49",
+      "accent-2-rgb": "155 77 138",
+      "gradient-brand-text": "linear-gradient(135deg, #f68d31 0%, #e9a9d9 100%)"
+    },
+    "light": {
+      "bg-rgb": "250 246 250",
+      "surface-rgb": "255 255 255",
+      "surface-raised-rgb": "243 237 242",
+      "text-rgb": "31 22 30",
+      "accent-rgb": "246 141 49",
+      "accent-2-rgb": "155 77 138",
+      "gradient-brand-text": "linear-gradient(135deg, #9b4804 0%, #9b4d8a 100%)"
+    }
+  },
   "static": {
     "orange-50": "#fef5ed",
     "orange-100": "#ffe8d5",

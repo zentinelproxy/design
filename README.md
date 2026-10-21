@@ -9,7 +9,7 @@
 
 <h3 align="center">Zentinel design tokens</h3>
 
-<p align="center">One <code>tokens.json</code> for colour, type, spacing, radius, shadow and motion, compiled for zentinelproxy.io and its docs.</p>
+<p align="center">One <code>tokens.json</code> for colour, type, spacing, radius, shadow and motion, compiled for zentinelproxy.io, its docs, the API reference and the agent registry.</p>
 
 <p align="center">
   <a href="https://zentinelproxy.io">Website</a> &middot;
@@ -23,8 +23,8 @@ The single source of truth for Zentinel's look. `build.ts` reads `tokens.json`,
 checks every declared text/background pairing against WCAG contrast in both
 themes, and writes Sass partials, CSS custom properties and a preview page to
 `dist/`. `scripts/sync.ts` then vendors those files into the consumer repos,
-so the site and the docs share one palette, one type scale and one button
-while staying two separate Zola sites.
+so the site, the docs, the API reference and the registry share one palette,
+one type scale and one button while staying four separate Zola sites.
 
 It follows the design repo behind cyanea.bio: same
 `tokens.json` → `build.ts` → committed copies in each consumer, Deno pinned
@@ -44,8 +44,10 @@ open dist/preview/index.html
 |---|---|
 | `deno task build` | gate contrast, write `dist/` (CSS, Sass, resolved JSON, preview) |
 | `deno task check` | gate contrast only, write nothing (for CI) |
-| `deno task sync` | copy `dist/` + `fonts/` into `../zentinelproxy.io` and `../zentinelproxy.io-docs` |
+| `deno task sync` | copy `dist/` + `fonts/` into the four consumers checked out next to this repo |
 | `deno task sync --check` | report consumer copies that are stale, exit 1 if any |
+| `deno task sync --check --root <dir>` | the same, with the consumers under `<dir>` (or `DESIGN_CONSUMER_ROOT`) instead of `..` |
+| `deno task sync --check --strict` | also fail when a consumer is not checked out (what CI runs) |
 | `deno task marks` | regenerate the outlined wordmark and interim lockups (network + ImageMagick) |
 | `deno task ramps` | print the colour ramps derived from the brand accents |
 
@@ -57,13 +59,16 @@ design/
 ├── build.ts             # compiler + contrast gate + preview
 ├── lib/color.ts         # WCAG contrast, OKLCH conversions
 ├── scripts/
-│   ├── sync.ts          # vendor dist/ into consumers
+│   ├── sync.ts          # vendor dist/ into consumers, or --check them for drift
 │   ├── marks.ts         # outline the wordmark, build lockups
 │   └── ramps.ts         # derive ramps from #f68d31 / #9b4d8a
 ├── components/
 │   └── controls.css     # control styles, appended to frame.css by the build
 ├── fonts/               # WOFF2 + OFL licence files (see fonts/README.md)
 ├── marks/               # sources, wordmark, mark, lockups (see marks/PROVENANCE.md)
+├── .github/workflows/
+│   ├── ci.yml           # contrast gate + dist/ is what tokens.json builds to
+│   └── drift.yml        # the four consumers' main still match dist/
 ├── dist/                # GENERATED, committed
 │   ├── css/{tokens,fonts,frame,bridge}.css
 │   ├── scss/_{tokens,fonts,frame}.scss
@@ -79,23 +84,83 @@ Each consumer **commits its vendored copy**, the same mechanism cyanea uses
 (no submodule, no package). A consumer therefore
 builds on its own, and Cloudflare Pages never needs this repo.
 
-Check the consumers out next to this repo, then `deno task build && deno task sync`:
+Check the consumers out next to this repo (each under its repo name), then
+`deno task build && deno task sync`:
 
 | Consumer | Files it receives | How it loads them |
 |---|---|---|
-| `zentinelproxy.io` (Zola + Sass) | `sass/_tokens.scss`, `sass/_fonts.scss` (replaces the Geist one), `sass/_frame.scss`, `static/fonts/*` | `@import 'tokens'; @import 'fonts'; @import 'frame';` at the top of `sass/style.scss`, then use `var(--z-*)` |
-| `zentinelproxy.io-docs` (Zola + tanuki submodule) | `static/css/zentinel-{fonts,tokens,bridge,frame}.css`, `static/fonts/*` | `<link>` them in that order from the docs' own template override (where `site.css` is linked today), **after** the theme stylesheet. The docs restyle lives in the docs repo as overrides; tanuki is not edited |
-| registry / api (later) | `dist/css/tokens.css` or `dist/tokens.resolved.json` | add an entry to `CONSUMERS` in `scripts/sync.ts` |
+| `zentinelproxy.io` (Zola + Sass) | `sass/_tokens.scss`, `sass/_fonts.scss`, `sass/_frame.scss`, `static/fonts/*` | `@import 'tokens'; @import 'fonts'; @import 'frame';` at the top of `sass/style.scss`, then use `var(--z-*)` |
+| `registry.zentinelproxy.io` (Zola + Sass) | the same as `zentinelproxy.io` | the same |
+| `zentinelproxy.io-docs` (Zola + tanuki submodule) | `static/css/zentinel-{fonts,tokens,bridge,frame}.css`, `static/fonts/*` | `<link>` them in that order from the docs' own template override, **after** the theme stylesheet. The docs restyle lives in the docs repo as overrides; tanuki is not edited |
+| `api.zentinelproxy.io` (Zola, plain CSS) | `static/css/{tokens,fonts,frame}.css`, `static/fonts/*` | `<link>` from its own templates |
 
-`bridge.css` maps the names tanuki reads (`--color-bg`, `--color-accent`,
-`--color-text-muted`, `--color-bg-rgb`, `--font-sans`, …) and the site's
-current names (`--color-primary`, `--color-bg-subtle`) onto `--z-*`, so the
-docs pick up the palette and fonts without forking the theme. tanuki's
-`[data-theme]` attribute on `<html>` drives both.
+A new consumer is one entry in `CONSUMERS` in `scripts/sync.ts` plus one
+checkout step in `.github/workflows/drift.yml`.
 
-Never edit a vendored file in a consumer: the next sync overwrites it. A
-consumer CI can run `deno task sync --check` from a checkout of this repo to
-catch drift.
+### The tanuki bridge
+
+`bridge.css` lets any site on the tanuki theme follow the tokens without
+forking the theme. It is custom properties on `:root` only, no selectors, and
+it maps:
+
+- tanuki's semantic names: `--color-bg`, `--color-bg-surface`,
+  `--color-text-muted`, `--color-accent`, `--color-border-strong`, … and the
+  site's legacy `--color-primary` / `--color-bg-subtle`;
+- the Catppuccin palette tanuki's components read directly (`--ctp-base`,
+  `--ctp-mantle`, `--ctp-surface0`, `--ctp-mauve`, `--ctp-blue`, … all 26);
+- `--radius-sm/md/lg/xl` (tanuki's lg/xl take our md/lg), `--shadow-sm/md/lg/xl`,
+  and `--shadow-glow` (off);
+- `--font-sans` / `--font-mono`, and tanuki's comma-form `--color-bg-rgb` /
+  `--color-accent-rgb` per theme.
+
+tanuki's `[data-theme]` attribute on `<html>` drives both. What a variable
+cannot reach stays a selector override in the consumer: tanuki's `h1`–`h6`
+rule sets `color: var(--color-text)` rather than `--color-heading`, and a few
+tanuki rules hard-code Catppuccin hexes (`pre`, the code header bar).
+
+### Channel variables
+
+Every `--z-*-rgb` is **space-separated** `R G B`, used as
+`rgb(var(--z-bg-rgb) / 0.8)`: `--z-shadow-rgb` and the derived
+`--z-bg-rgb`, `--z-surface-rgb`, `--z-surface-raised-rgb`, `--z-text-rgb`,
+`--z-accent-rgb`, `--z-accent-2-rgb`, set per theme in `tokens.css`. The only
+comma-separated triplets are tanuki's own `--color-bg-rgb` and
+`--color-accent-rgb` in `bridge.css`, kept in that form because tanuki writes
+`rgba(var(--color-bg-rgb), 0.8)`; new code should not use them.
+
+### Gradients
+
+`--z-gradient-brand` (orange-400 → plum-600) is decorative: bars, rules,
+fills. It fails contrast for text at one end in each theme. For gradient text
+use `--z-gradient-brand-text` (`accent-text` → `accent-2-text`, per theme)
+with `background-clip: text`. The build gates both stops and the colour at
+25/50/75 % against `bg`, `surface` and `surface-raised`.
+
+Never edit a vendored file in a consumer: the next sync overwrites it, and
+the drift check reports it.
+
+## Drift
+
+`.github/workflows/drift.yml` runs on every push to main, on pull requests
+and daily. It checks out the four consumers' `main` next to this repo and runs
+`deno task sync --check --strict --root "$GITHUB_WORKSPACE"`. The job summary
+lists each consumer as up to date or stale, with the files that differ. On a
+pull request that changes tokens, drift is expected and the step only reports;
+on main and on the daily run it fails.
+
+When it reports a consumer as stale:
+
+1. Check out that consumer next to this repo (or pass `--root`).
+2. Here, on an up-to-date main: `deno task build && deno task sync`.
+3. In the consumer: review the diff, build it, commit the vendored files
+   (and nothing else) in one commit, and open a PR there.
+4. If the stale file was edited by hand in the consumer, move that change into
+   `tokens.json` (or `components/`) here first; the sync reverts it.
+
+Each consumer can carry the same check from its side: a job that checks out
+this repo at `main` and runs `deno task sync --check --root ..` against its
+own checkout (only that consumer is present, so the others are skipped). No
+secret is needed; every repo here is public.
 
 ## Changing a token
 
@@ -126,10 +191,11 @@ build refuses a mismatch) and, if it is ever text or a UI boundary, to a
   the same four for `accent-2`, `link`/`link-hover`, `focus`,
   `success`/`warn`/`danger`/`info`, `code-bg`/`code-fg`/`code-accent`,
   `selection-bg`/`selection-fg`, `button-edge`/`button-2-edge`, and
-  `shadow-rgb`. Dark is the default ground; `[data-theme="light"]` or the OS
+  `shadow-rgb` (plus the derived `*-rgb` channels, see above). Dark is the default ground; `[data-theme="light"]` or the OS
   preference switches.
-- **contrast**: the pairings the build checks. 61 per theme today, all
-  passing (lowest text pairing 5.14:1 dark, 4.76:1 light).
+- **contrast**: the pairings the build checks. 72 per theme today (with the
+  text-gradient samples), all passing (lowest text pairing 5.14:1 dark,
+  4.76:1 light).
 - **font**: Unbounded (display), Atkinson Hyperlegible Next (text),
   Atkinson Hyperlegible Mono (code), all OFL 1.1. **fontFace** lists the
   WOFF2 files.
@@ -145,6 +211,8 @@ build refuses a mismatch) and, if it is ever text or a UI boundary, to a
   the button sizes and states `.z-btn--sm/--lg/--ghost/--icon`, `:disabled`,
   `aria-busy="true"` (loading). All class-scoped, so they never restyle a
   consumer theme by element.
+- **gradient** (decorative) and **gradientText** (stops are roles, gated
+  for text).
 - **motion** + **reducedMotion**: durations and easings; under
   `prefers-reduced-motion: reduce` durations go to 0 and `--z-lift` to 0, so
   the button keeps its colour feedback and stops moving.
