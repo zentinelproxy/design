@@ -160,10 +160,10 @@ wordmark is vector (outlined Unbounded 700); the lockups are interim (raster
 disc + vector wordmark) until the mascot is redrawn as vector. Details and
 provenance: [`marks/PROVENANCE.md`](marks/PROVENANCE.md).
 
-## Licence
+## License
 
 The code and tokens are MIT (see [`LICENSE`](LICENSE)), like the site. The
-fonts are under the SIL Open Font License 1.1; each family's licence file sits
+fonts are under the SIL Open Font License 1.1; each family's license file sits
 next to it in `fonts/`. The shisa, the wordmark and the lockups are Zentinel's
 marks: use them to refer to Zentinel, not as the mark of something else.
 
