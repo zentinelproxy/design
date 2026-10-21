@@ -1,0 +1,64 @@
+# Design drift: do the four consumers still carry what dist/ holds?
+#
+# Checks out each consumer's main next to this repo, the same layout as a
+# local checkout, and runs `deno task sync --check --strict`. The job summary
+# has one row per consumer (up to date / stale, with the files); the log names
+# every stale file. Fix: README.md, "Drift".
+#
+# On a pull request that changes tokens, drift is the expected result (the
+# consumers are synced after the merge), so there the step reports and does
+# not fail. On main and on the daily run it fails, which catches both a merged
+# token change nobody synced and a hand edit to a vendored copy in a consumer.
+name: Design drift
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "17 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  drift:
+    name: Consumers in sync with dist/
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: design
+
+      # Public repos: no token beyond the default one is needed.
+      - uses: actions/checkout@v4
+        with:
+          repository: zentinelproxy/zentinelproxy.io
+          ref: main
+          path: zentinelproxy.io
+      - uses: actions/checkout@v4
+        with:
+          repository: zentinelproxy/zentinelproxy.io-docs
+          ref: main
+          path: zentinelproxy.io-docs
+      - uses: actions/checkout@v4
+        with:
+          repository: zentinelproxy/api.zentinelproxy.io
+          ref: main
+          path: api.zentinelproxy.io
+      - uses: actions/checkout@v4
+        with:
+          repository: zentinelproxy/registry.zentinelproxy.io
+          ref: main
+          path: registry.zentinelproxy.io
+
+      - uses: jdx/mise-action@v2
+        with:
+          working_directory: design
+
+      - name: Compare each consumer with dist/
+        working-directory: design
+        continue-on-error: ${{ github.event_name == 'pull_request' }}
+        run: deno task sync --check --strict --root "$GITHUB_WORKSPACE"

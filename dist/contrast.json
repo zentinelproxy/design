@@ -693,6 +693,105 @@
     "pass": true
   },
   {
+    "theme": "dark",
+    "fg": "gradient-brand-text@25%",
+    "bg": "bg",
+    "fgHex": "#f3945b",
+    "bgHex": "#160d15",
+    "ratio": 8.34,
+    "level": "text",
+    "min": 4.5,
+    "pass": true
+  },
+  {
+    "theme": "dark",
+    "fg": "gradient-brand-text@50%",
+    "bg": "bg",
+    "fgHex": "#f09b85",
+    "bgHex": "#160d15",
+    "ratio": 8.83,
+    "level": "text",
+    "min": 4.5,
+    "pass": true
+  },
+  {
+    "theme": "dark",
+    "fg": "gradient-brand-text@75%",
+    "bg": "bg",
+    "fgHex": "#eca2af",
+    "bgHex": "#160d15",
+    "ratio": 9.39,
+    "level": "text",
+    "min": 4.5,
+    "pass": true
+  },
+  {
+    "theme": "dark",
+    "fg": "gradient-brand-text@25%",
+    "bg": "surface",
+    "fgHex": "#f3945b",
+    "bgHex": "#1f161e",
+    "ratio": 7.72,
+    "level": "text",
+    "min": 4.5,
+    "pass": true
+  },
+  {
+    "theme": "dark",
+    "fg": "gradient-brand-text@50%",
+    "bg": "surface",
+    "fgHex": "#f09b85",
+    "bgHex": "#1f161e",
+    "ratio": 8.17,
+    "level": "text",
+    "min": 4.5,
+    "pass": true
+  },
+  {
+    "theme": "dark",
+    "fg": "gradient-brand-text@75%",
+    "bg": "surface",
+    "fgHex": "#eca2af",
+    "bgHex": "#1f161e",
+    "ratio": 8.69,
+    "level": "text",
+    "min": 4.5,
+    "pass": true
+  },
+  {
+    "theme": "dark",
+    "fg": "gradient-brand-text@25%",
+    "bg": "surface-raised",
+    "fgHex": "#f3945b",
+    "bgHex": "#2a1f28",
+    "ratio": 6.94,
+    "level": "text",
+    "min": 4.5,
+    "pass": true
+  },
+  {
+    "theme": "dark",
+    "fg": "gradient-brand-text@50%",
+    "bg": "surface-raised",
+    "fgHex": "#f09b85",
+    "bgHex": "#2a1f28",
+    "ratio": 7.34,
+    "level": "text",
+    "min": 4.5,
+    "pass": true
+  },
+  {
+    "theme": "dark",
+    "fg": "gradient-brand-text@75%",
+    "bg": "surface-raised",
+    "fgHex": "#eca2af",
+    "bgHex": "#2a1f28",
+    "ratio": 7.81,
+    "level": "text",
+    "min": 4.5,
+    "pass": true
+  },
+  {
     "theme": "light",
     "fg": "text",
     "bg": "bg",
@@ -1383,6 +1482,105 @@
     "ratio": 10.13,
     "level": "ui",
     "min": 3,
+    "pass": true
+  },
+  {
+    "theme": "light",
+    "fg": "gradient-brand-text@25%",
+    "bg": "bg",
+    "fgHex": "#9b4926",
+    "bgHex": "#faf6fa",
+    "ratio": 5.82,
+    "level": "text",
+    "min": 4.5,
+    "pass": true
+  },
+  {
+    "theme": "light",
+    "fg": "gradient-brand-text@50%",
+    "bg": "bg",
+    "fgHex": "#9b4b47",
+    "bgHex": "#faf6fa",
+    "ratio": 5.62,
+    "level": "text",
+    "min": 4.5,
+    "pass": true
+  },
+  {
+    "theme": "light",
+    "fg": "gradient-brand-text@75%",
+    "bg": "bg",
+    "fgHex": "#9b4c69",
+    "bgHex": "#faf6fa",
+    "ratio": 5.4,
+    "level": "text",
+    "min": 4.5,
+    "pass": true
+  },
+  {
+    "theme": "light",
+    "fg": "gradient-brand-text@25%",
+    "bg": "surface",
+    "fgHex": "#9b4926",
+    "bgHex": "#ffffff",
+    "ratio": 6.22,
+    "level": "text",
+    "min": 4.5,
+    "pass": true
+  },
+  {
+    "theme": "light",
+    "fg": "gradient-brand-text@50%",
+    "bg": "surface",
+    "fgHex": "#9b4b47",
+    "bgHex": "#ffffff",
+    "ratio": 6.02,
+    "level": "text",
+    "min": 4.5,
+    "pass": true
+  },
+  {
+    "theme": "light",
+    "fg": "gradient-brand-text@75%",
+    "bg": "surface",
+    "fgHex": "#9b4c69",
+    "bgHex": "#ffffff",
+    "ratio": 5.78,
+    "level": "text",
+    "min": 4.5,
+    "pass": true
+  },
+  {
+    "theme": "light",
+    "fg": "gradient-brand-text@25%",
+    "bg": "surface-raised",
+    "fgHex": "#9b4926",
+    "bgHex": "#f3edf2",
+    "ratio": 5.4,
+    "level": "text",
+    "min": 4.5,
+    "pass": true
+  },
+  {
+    "theme": "light",
+    "fg": "gradient-brand-text@50%",
+    "bg": "surface-raised",
+    "fgHex": "#9b4b47",
+    "bgHex": "#f3edf2",
+    "ratio": 5.22,
+    "level": "text",
+    "min": 4.5,
+    "pass": true
+  },
+  {
+    "theme": "light",
+    "fg": "gradient-brand-text@75%",
+    "bg": "surface-raised",
+    "fgHex": "#9b4c69",
+    "bgHex": "#f3edf2",
+    "ratio": 5.01,
+    "level": "text",
+    "min": 4.5,
     "pass": true
   }
 ]

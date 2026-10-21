@@ -10,7 +10,8 @@
  *   dist/css/frame.css         shared frame pieces: ::selection, :focus-visible, the physical button,
  *                              and the controls in components/controls.css (fields, checks, switches,
  *                              segmented controls, tabs, choice cards, copy buttons, menus, tooltips)
- *   dist/css/bridge.css        maps tanuki's (docs) and the current site's --color-* names onto --z-*
+ *   dist/css/bridge.css        maps tanuki's names (--color-*, --ctp-*, --radius-*, --shadow-*) and the
+ *                              site's legacy --color-* names onto --z-*, so any tanuki-based site follows
  *   dist/scss/_tokens.scss     the same as Sass: $z-* variables, theme maps + mixins, and the custom properties
  *   dist/scss/_fonts.scss      @font-face with a $z-font-path override
  *   dist/scss/_frame.scss      frame.css as a partial
@@ -21,7 +22,7 @@
  * `--check` runs the contrast gate and writes nothing.
  */
 
-import { contrast } from "./lib/color.ts";
+import { contrast, over } from "./lib/color.ts";
 
 type Dict = Record<string, unknown>;
 const CHECK_ONLY = Deno.args.includes("--check");
@@ -66,6 +67,42 @@ if (darkKeys !== Object.keys(roles.light).sort().join()) {
   throw new Error("semantic.dark and semantic.light must define the same roles");
 }
 
+// Text-safe gradients: stops are semantic roles, resolved per theme.
+type GradientText = { angle: string; stops: string[]; on: string[] };
+const gradientText = entries(tokens.gradientText ?? {}) as [string, GradientText][];
+for (const [name, g] of gradientText) {
+  for (const r of [...g.stops, ...g.on]) {
+    if (!(r in roles.dark)) throw new Error(`gradientText.${name} names unknown role ${r}`);
+  }
+}
+
+/** The colour at fraction f (0..1) along evenly spaced stops, mixed in sRGB like a CSS gradient. */
+function along(hexes: string[], f: number): string {
+  const seg = Math.min(hexes.length - 2, Math.floor(f * (hexes.length - 1)));
+  const local = f * (hexes.length - 1) - seg;
+  return over(hexes[seg + 1], local, hexes[seg]);
+}
+
+const gradientCss = (t: Theme, g: GradientText) => {
+  const n = g.stops.length - 1;
+  return `linear-gradient(${g.angle}, ${g.stops.map((r, i) => `${roles[t][r]} ${Math.round((i / n) * 100)}%`).join(", ")})`;
+};
+
+// Channel variables: --z-<role>-rgb as space-separated "R G B", for
+// rgb(var(--z-bg-rgb) / 0.8). One syntax for every --z-*-rgb, the same as
+// the shadow-rgb role. (tanuki's legacy --color-*-rgb are comma-separated;
+// the bridge emits those separately, see buildBridgeCss.)
+const CHANNEL_ROLES = ["bg", "surface", "surface-raised", "text", "accent", "accent-2"];
+const channels = (hex: string) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(" ");
+
+/** Per-theme values derived from the roles: channel triplets and text gradients. */
+function themeExtras(t: Theme): [string, string][] {
+  return [
+    ...CHANNEL_ROLES.map((r) => [`${r}-rgb`, channels(roles[t][r])] as [string, string]),
+    ...gradientText.map(([name, g]) => [`gradient-${name}`, gradientCss(t, g)] as [string, string]),
+  ];
+}
+
 // ── Contrast gate ────────────────────────────────────────────────
 
 const MIN = { text: 4.5, large: 3, ui: 3 } as Record<string, number>;
@@ -86,6 +123,23 @@ for (const t of THEMES) {
         const min = MIN[rule.level];
         if (min === undefined) throw new Error(`unknown contrast level ${rule.level}`);
         results.push({ theme: t, fg, bg, fgHex, bgHex, ratio: +ratio.toFixed(2), level: rule.level, min, pass: ratio >= min });
+      }
+    }
+  }
+  // Every text gradient: each stop and the colour between them, on each ground it may sit on.
+  for (const [name, g] of gradientText) {
+    const hexes = g.stops.map((r) => roles[t][r]);
+    const samples: [string, string][] = [
+      ...g.stops.map((r) => [r, roles[t][r]] as [string, string]),
+      ...[0.25, 0.5, 0.75].map((f) => [`gradient-${name}@${f * 100}%`, along(hexes, f)] as [string, string]),
+    ];
+    for (const bg of g.on) {
+      for (const [fg, fgHex] of samples) {
+        const key = `${t}|${fg}|${bg}|text`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        const ratio = contrast(fgHex, roles[t][bg]);
+        results.push({ theme: t, fg, bg, fgHex, bgHex: roles[t][bg], ratio: +ratio.toFixed(2), level: "text", min: MIN.text, pass: ratio >= MIN.text });
       }
     }
   }
@@ -132,11 +186,13 @@ function staticVars(): [string, string][] {
   return out;
 }
 
+// Comma-separated triplet, only for tanuki's legacy --color-*-rgb (it writes
+// rgba(var(--color-bg-rgb), a), which a space-separated value would break).
 const rgbTriplet = (hex: string) =>
   [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(", ");
 
 function themeVars(t: Theme): [string, string][] {
-  return Object.entries(roles[t]).map(([k, v]) => [k, v]);
+  return [...Object.entries(roles[t]), ...themeExtras(t)];
 }
 
 const reduced = entries(tokens.reducedMotion) as [string, string][];
@@ -277,47 +333,93 @@ const FRAME_CSS = `${CSS_HEADER}
 ${CONTROLS_CSS}`;
 
 function buildBridgeCss(): string {
-  // tanuki (docs theme) reads these on :root; later rules win at equal specificity,
-  // so load bridge.css after the theme's stylesheet.
+  // Everything here is a custom property on :root, never a selector rule, so
+  // the bridge recolours a theme without restyling any element. tanuki
+  // declares its own values on :root and [data-theme] (both specificity
+  // 0,1,0); later rules win at equal specificity, so load bridge.css AFTER the
+  // theme stylesheet.
+  const pairs = (list: [string, string][]) => list.map(([from, to]) => `  --${from}: var(--z-${to});`).join("\n");
+
+  // tanuki's semantic names (sass/tokens/_colors.scss), read by every component.
   const tanuki: [string, string][] = [
     ["color-text", "text"], ["color-text-secondary", "text"], ["color-text-muted", "muted"],
     ["color-text-subtle", "muted"], ["color-text-faint", "muted"], ["color-heading", "heading"],
     ["color-bg", "bg"], ["color-bg-alt", "surface"], ["color-bg-surface", "surface"],
     ["color-bg-elevated", "surface-raised"], ["color-bg-overlay", "surface-raised"], ["color-bg-hover", "surface-raised"],
     ["color-border", "border"], ["color-border-muted", "border"], ["color-border-subtle", "border"],
+    ["color-border-strong", "border-strong"],
     ["color-accent", "accent-text"], ["color-accent-hover", "link-hover"],
     ["color-link", "link"], ["color-link-hover", "link-hover"], ["color-highlight", "accent-2-text"],
     ["color-success", "success"], ["color-warning", "warn"], ["color-error", "danger"], ["color-info", "info"],
     ["color-code-bg", "code-bg"], ["color-code-border", "border"], ["color-code-accent", "code-accent"],
-    // zentinelproxy.io's current names (sass/style.scss), for the migration
+    // zentinelproxy.io's pre-token names, for the migration
     ["color-bg-subtle", "surface"], ["color-primary", "accent-2-text"], ["color-primary-hover", "accent-2-hover"],
   ];
-  const lines = tanuki.map(([from, to]) => `  --${from}: var(--z-${to});`).join("\n");
-  const rgb = (t: Theme) =>
+
+  // The Catppuccin palette itself. tanuki's components read --ctp-* directly
+  // in ~200 places (inline code, code blocks, sidebar, buttons, search), which
+  // the semantic names above do not reach; pointing the palette at the roles
+  // recolours all of them. Hues map by what tanuki uses them for: mauve/peach
+  // are its accent, blue its links, pink/teal its secondary accent.
+  const ctp: [string, string][] = [
+    ["ctp-base", "bg"], ["ctp-mantle", "surface"], ["ctp-crust", "surface-raised"],
+    ["ctp-surface0", "surface-raised"], ["ctp-surface1", "border"], ["ctp-surface2", "border-strong"],
+    ["ctp-overlay0", "muted"], ["ctp-overlay1", "muted"], ["ctp-overlay2", "muted"],
+    ["ctp-text", "text"], ["ctp-subtext1", "text"], ["ctp-subtext0", "muted"],
+    ["ctp-mauve", "accent-text"], ["ctp-peach", "accent-text"], ["ctp-pink", "accent-2-text"],
+    ["ctp-teal", "accent-2-text"], ["ctp-rosewater", "accent-2-text"], ["ctp-flamingo", "accent-2-text"],
+    ["ctp-lavender", "link-hover"], ["ctp-blue", "link"], ["ctp-sapphire", "info"], ["ctp-sky", "info"],
+    ["ctp-green", "success"], ["ctp-yellow", "warn"], ["ctp-red", "danger"], ["ctp-maroon", "danger"],
+  ];
+
+  // Shape and depth. tanuki's radii run one step tighter than ours, so its lg
+  // (cards, dialogs) takes our md and its xl takes our lg. --shadow-xl is read
+  // by tanuki but never defined there. The glow is tanuki's purple halo: off.
+  const shape: [string, string][] = [
+    ["radius-sm", "radius-sm"], ["radius-md", "radius-md"], ["radius-lg", "radius-md"], ["radius-xl", "radius-lg"],
+    ["shadow-sm", "shadow-sm"], ["shadow-md", "shadow-md"], ["shadow-lg", "shadow-lg"], ["shadow-xl", "shadow-lg"],
+  ];
+
+  // tanuki's legacy channel names are comma-separated because tanuki writes
+  // rgba(var(--color-bg-rgb), 0.8). New code uses the space-separated
+  // --z-*-rgb from tokens.css: rgb(var(--z-bg-rgb) / 0.8).
+  const legacyRgb = (t: Theme) =>
     `  --color-bg-rgb: ${rgbTriplet(roles[t].bg)};\n  --color-accent-rgb: ${rgbTriplet(roles[t]["accent"])};`;
   return `${CSS_HEADER}
-/* Bridge: point the existing --color-* / --font-* names used by the tanuki
-   theme (zentinelproxy.io-docs) and by zentinelproxy.io's current styles at
-   the --z-* roles. Load after tokens.css AND after the theme stylesheet. */
+/* Bridge: point the names a tanuki-based site reads (tanuki's --color-*,
+   the Catppuccin --ctp-* palette, --radius-*, --shadow-*, --font-*) and
+   zentinelproxy.io's legacy --color-* names at the --z-* roles. Custom
+   properties only, no selectors. Load after tokens.css AND after the theme
+   stylesheet.
+
+   Not reachable from here, so a consumer still needs a selector override:
+   tanuki's h1-h6 rule sets color: var(--color-text), not --color-heading,
+   and a few tanuki rules hard-code Catppuccin hexes (pre, its header bar). */
 
 :root {
-${lines}
+${pairs(tanuki)}
+
+${pairs(ctp)}
+
+${pairs(shape)}
+  --shadow-glow: 0 0 0 transparent;
+
   --font-sans: var(--z-font-text);
   --font-mono: var(--z-font-mono);
 }
 
 :root,
 [data-theme="dark"] {
-${rgb("dark")}
+${legacyRgb("dark")}
 }
 
 [data-theme="light"] {
-${rgb("light")}
+${legacyRgb("light")}
 }
 
 @media (prefers-color-scheme: light) {
   :root:not([data-theme]) {
-${rgb("light").replace(/^/gm, "  ")}
+${legacyRgb("light").replace(/^/gm, "  ")}
   }
 }
 `;
@@ -332,8 +434,8 @@ function buildTokensScss(css: string): string {
     /^(#[0-9a-f]{6}|[0-9.]+(px|rem|em|ms|ch|%)?|-?[0-9.]+em)$/i.test(val) ? val : `unquote("${val}")`;
   const v = staticVars().map(([k, val]) => `$z-${k}: ${scssVal(val)};`).join("\n");
   const themed = THEMES.map((t) =>
-    `${Object.entries(roles[t]).map(([k, val]) => `$z-${t}-${k}: ${val};`).join("\n")}\n\n$z-theme-${t}: (\n${
-      Object.entries(roles[t]).map(([k, val]) => `  "${k}": ${/^#/.test(val) ? val : `"${val}"`},`).join("\n")
+    `${themeVars(t).map(([k, val]) => `$z-${t}-${k}: ${/[(,]/.test(val) ? `unquote("${val}")` : val};`).join("\n")}\n\n$z-theme-${t}: (\n${
+      themeVars(t).map(([k, val]) => `  "${k}": ${/^#/.test(val) ? val : `"${val}"`},`).join("\n")
     }\n);`
   ).join("\n\n");
   return `${HEADER}
@@ -474,6 +576,7 @@ p{max-width:var(--z-layout-prose)}
 .favs{display:flex;gap:var(--z-space-4);align-items:end;flex-wrap:wrap}
 .favs figure{margin:0;text-align:center;font-size:var(--z-size-xs);color:var(--z-muted)}
 .grad{height:56px;border-radius:var(--z-radius-md);background:var(--z-gradient-brand)}
+.gtext{margin:0;font:var(--z-weight-display) var(--z-size-2xl)/1.1 var(--z-font-display);letter-spacing:var(--z-tracking-display);background:var(--z-gradient-brand-text);-webkit-background-clip:text;background-clip:text;color:transparent}
 .note{border:1px solid var(--z-border-strong);border-radius:var(--z-radius-md);padding:var(--z-space-4);background:var(--z-surface)}
 </style>
 </head>
@@ -496,7 +599,8 @@ ${pair((t) => `<div class="marks">
 <figure><img src="../../marks/source/favicon.png" width="32" height="32" alt=""><figcaption>favicon 32</figcaption></figure>
 <figure><img src="../../marks/source/favicon.png" width="16" height="16" alt=""><figcaption>at 16</figcaption></figure>
 </div>
-<div class="grad" title="--z-gradient-brand"></div>
+<div class="grad" title="--z-gradient-brand (decorative only)"></div>
+<p class="gtext" title="--z-gradient-brand-text">Guardian of the free web</p>
 </div>`)}
 
 <h2>Primitives</h2>
@@ -592,6 +696,7 @@ const fontsScss = `${HEADER}\n// Override before importing: $z-font-path: '/stat
 const resolved = {
   color: tokens.color,
   semantic: roles,
+  derived: Object.fromEntries(THEMES.map((t) => [t, Object.fromEntries(themeExtras(t))])),
   static: Object.fromEntries(staticVars()),
   reducedMotion: Object.fromEntries(reduced),
 };
