@@ -12,9 +12,9 @@
 <p align="center">{One sentence: write Zentinel agents in {Language}, speaking agent protocol v2 over a Unix socket or gRPC.}</p>
 
 <p align="center">
-  [![CI](https://github.com/zentinelproxy/{REPO}/actions/workflows/{WORKFLOW}.yml/badge.svg)](https://github.com/zentinelproxy/{REPO}/actions/workflows/{WORKFLOW}.yml)
-  ![License](https://img.shields.io/badge/license-{SPDX}-9b4d8a?style=flat&labelColor=1f161e)
-  ![Agent protocol](https://img.shields.io/badge/agent%20protocol-v2-f68d31?style=flat&labelColor=1f161e)
+  <a href="https://github.com/zentinelproxy/{REPO}/actions/workflows/{WORKFLOW}.yml"><img alt="CI" src="https://github.com/zentinelproxy/{REPO}/actions/workflows/{WORKFLOW}.yml/badge.svg"></a>
+  <img alt="License: {SPDX}" src="https://img.shields.io/badge/license-{SPDX}-9b4d8a?style=flat&labelColor=1f161e">
+  <img alt="Agent protocol v2" src="https://img.shields.io/badge/agent%20protocol-v2-f68d31?style=flat&labelColor=1f161e">
   {toolchain badge}
 </p>
 

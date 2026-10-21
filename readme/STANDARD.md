@@ -48,14 +48,18 @@ Copy the matching template from [`templates/`](templates/) and fill it in.
 
 At most four, in this order, all `style=flat`:
 
-| Badge | Markdown |
-|---|---|
-| CI (only if the repository has a workflow that runs on `main`) | `[![CI](https://github.com/zentinelproxy/<repo>/actions/workflows/<file>.yml/badge.svg)](https://github.com/zentinelproxy/<repo>/actions/workflows/<file>.yml)` |
-| Licence (the SPDX id in `LICENSE`, not in a manifest) | `![License](https://img.shields.io/badge/license-<SPDX>-9b4d8a?style=flat&labelColor=1f161e)` |
-| Language / toolchain minimum, only if it is enforced somewhere (MSRV in `Cargo.toml`, `go` line in `go.mod`, `engines`, `requires-python`) | `![Rust](https://img.shields.io/badge/rust-1.85%2B-f68d31?style=flat&labelColor=1f161e&logo=rust&logoColor=white)` |
-| Agent protocol, agents and SDKs only | `![Agent protocol](https://img.shields.io/badge/agent%20protocol-v2-f68d31?style=flat&labelColor=1f161e)` |
+Write them as HTML, one per line inside the centered `<p>`. Markdown image
+syntax is not parsed inside an HTML block, so `![..](..)` there shows up on
+GitHub as literal text.
 
-Colours: `f68d31` (shisa orange) or `9b4d8a` (plum) on label `1f161e`. No
+| Badge | HTML |
+|---|---|
+| CI (only if the repository has a workflow that runs on the default branch) | `<a href="https://github.com/zentinelproxy/<repo>/actions/workflows/<file>.yml"><img alt="CI" src="https://github.com/zentinelproxy/<repo>/actions/workflows/<file>.yml/badge.svg"></a>` |
+| License (the SPDX id in `LICENSE`, not in a manifest; no badge if there is no `LICENSE` file) | `<img alt="License: <SPDX>" src="https://img.shields.io/badge/license-<SPDX>-9b4d8a?style=flat&labelColor=1f161e">` |
+| Language / toolchain minimum, only if it is enforced somewhere (MSRV in `Cargo.toml`, `go` line in `go.mod`, `engines`, `requires-python`) | `<img alt="Rust 1.85+" src="https://img.shields.io/badge/rust-1.85%2B-f68d31?style=flat&labelColor=1f161e&logo=rust&logoColor=white">` |
+| Agent protocol, agents and SDKs only | `<img alt="Agent protocol v2" src="https://img.shields.io/badge/agent%20protocol-v2-f68d31?style=flat&labelColor=1f161e">` |
+
+Colors: `f68d31` (shisa orange) or `9b4d8a` (plum) on label `1f161e`. No
 Catppuccin hexes (`c6a0f6`, `f5a97f`, ...), no `for-the-badge`, no badges
 for things that are not checked (stars, "PRs welcome", "made with").
 

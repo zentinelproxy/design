@@ -12,8 +12,8 @@
 <p align="center">{One sentence.}</p>
 
 <p align="center">
-  [![CI](https://github.com/zentinelproxy/{REPO}/actions/workflows/{WORKFLOW}.yml/badge.svg)](https://github.com/zentinelproxy/{REPO}/actions/workflows/{WORKFLOW}.yml)
-  ![License](https://img.shields.io/badge/license-{SPDX}-9b4d8a?style=flat&labelColor=1f161e)
+  <a href="https://github.com/zentinelproxy/{REPO}/actions/workflows/{WORKFLOW}.yml"><img alt="CI" src="https://github.com/zentinelproxy/{REPO}/actions/workflows/{WORKFLOW}.yml/badge.svg"></a>
+  <img alt="License: {SPDX}" src="https://img.shields.io/badge/license-{SPDX}-9b4d8a?style=flat&labelColor=1f161e">
   {toolchain badge}
 </p>
 
