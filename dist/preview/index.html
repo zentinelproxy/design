@@ -233,6 +233,22 @@
   --z-button-padding-x: 1.375rem;
   --z-button-radius: 10px;
   --z-button-font-weight: 600;
+  --z-button-padding-y-sm: 0.5rem;
+  --z-button-padding-x-sm: 0.875rem;
+  --z-button-font-size-sm: 0.875rem;
+  --z-button-padding-y-lg: 0.9375rem;
+  --z-button-padding-x-lg: 1.75rem;
+  --z-button-font-size-lg: 1.125rem;
+  --z-control-height-sm: 2.25rem;
+  --z-control-height-md: 2.75rem;
+  --z-control-height-lg: 3.25rem;
+  --z-control-target-min: 44px;
+  --z-control-padding-x: 0.875rem;
+  --z-control-radius: 6px;
+  --z-control-border-width: 1px;
+  --z-control-check-size: 1.125rem;
+  --z-control-switch-width: 2.5rem;
+  --z-control-switch-height: 1.5rem;
   --z-duration-fast: 120ms;
   --z-duration-base: 200ms;
   --z-duration-slow: 350ms;
@@ -434,6 +450,618 @@
   --_fg: var(--z-text);
 }
 
+/* ── Button sizes, variants and states (extends .z-btn above) ───────────── */
+
+.z-btn--sm {
+  padding: var(--z-button-padding-y-sm) var(--z-button-padding-x-sm);
+  font-size: var(--z-button-font-size-sm);
+}
+
+.z-btn--lg {
+  padding: var(--z-button-padding-y-lg) var(--z-button-padding-x-lg);
+  font-size: var(--z-button-font-size-lg);
+}
+
+/* Ghost: a flat outlined button for toolbars and secondary actions. No edge,
+   no lift; hover fills it with the raised surface. */
+.z-btn--ghost {
+  --_face: transparent;
+  --_face-hover: var(--z-surface-raised);
+  --_edge: transparent;
+  --_fg: var(--z-text);
+  --_d: 0px;
+  box-shadow: inset 0 0 0 var(--z-control-border-width) var(--z-border-strong);
+  transform: none;
+}
+
+.z-btn--ghost:hover,
+.z-btn--ghost:active {
+  --_d: 0px;
+  color: var(--z-heading);
+}
+
+.z-btn--ghost:focus-visible {
+  outline-offset: 2px;
+}
+
+/* A square button holding only an icon; give it an aria-label. */
+.z-btn--icon {
+  justify-content: center;
+  padding: 0;
+  width: var(--z-control-height-md);
+  height: var(--z-control-height-md);
+}
+
+.z-btn--icon.z-btn--sm {
+  width: var(--z-control-height-sm);
+  height: var(--z-control-height-sm);
+}
+
+.z-btn:disabled,
+.z-btn[aria-disabled="true"] {
+  --_face-hover: var(--_face);
+  --_d: var(--z-button-depth);
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.z-btn--ghost:disabled,
+.z-btn--ghost[aria-disabled="true"] {
+  --_d: 0px;
+}
+
+/* Loading: set aria-busy="true" (and disabled) while work runs. The label
+   stays for screen readers; a ring spins in front of it. The spin duration
+   is built from --z-duration-slow, so it stops under reduced motion. */
+.z-btn[aria-busy="true"] {
+  cursor: progress;
+  pointer-events: none;
+}
+
+.z-btn[aria-busy="true"]::before {
+  content: "";
+  width: 1em;
+  height: 1em;
+  flex: none;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: z-spin calc(var(--z-duration-slow) * 2.4) linear infinite;
+}
+
+@keyframes z-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Text fields, textareas and selects ─────────────────────────────────── */
+
+.z-field {
+  display: grid;
+  align-content: start;
+  gap: var(--z-space-1);
+  min-width: 0;
+}
+
+.z-label {
+  font-size: var(--z-size-sm);
+  font-weight: var(--z-weight-semibold);
+  color: var(--z-heading);
+}
+
+.z-hint {
+  font-size: var(--z-size-sm);
+  color: var(--z-muted);
+}
+
+.z-hint--error {
+  color: var(--z-danger);
+}
+
+.z-input,
+.z-textarea,
+.z-select {
+  width: 100%;
+  min-width: 0;
+  min-height: var(--z-control-height-md);
+  padding: 0 var(--z-control-padding-x);
+  border: var(--z-control-border-width) solid var(--z-border-strong);
+  border-radius: var(--z-control-radius);
+  background: var(--z-bg);
+  color: var(--z-text);
+  /* 16px keeps iOS from zooming into the field */
+  font: var(--z-weight-regular) var(--z-size-base) / var(--z-leading-body) var(--z-font-text);
+  transition:
+    border-color var(--z-duration-fast) var(--z-ease-standard),
+    background-color var(--z-duration-fast) var(--z-ease-standard);
+}
+
+.z-input::placeholder,
+.z-textarea::placeholder {
+  color: var(--z-muted);
+  opacity: 1;
+}
+
+.z-input:hover,
+.z-textarea:hover,
+.z-select:hover {
+  border-color: var(--z-muted);
+}
+
+.z-input:focus-visible,
+.z-textarea:focus-visible,
+.z-select:focus-visible {
+  border-color: var(--z-focus);
+}
+
+.z-input[aria-invalid="true"],
+.z-textarea[aria-invalid="true"],
+.z-select[aria-invalid="true"] {
+  border-color: var(--z-danger);
+}
+
+.z-input:disabled,
+.z-textarea:disabled,
+.z-select:disabled {
+  background: var(--z-surface-raised);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.z-input--sm,
+.z-select--sm {
+  min-height: var(--z-control-height-sm);
+  font-size: var(--z-size-sm);
+}
+
+.z-input--mono,
+.z-textarea--mono {
+  font-family: var(--z-font-mono);
+  font-size: var(--z-size-sm);
+  line-height: var(--z-leading-code);
+}
+
+.z-textarea {
+  display: block;
+  padding: var(--z-space-3) var(--z-control-padding-x);
+  resize: vertical;
+}
+
+/* The chevron is drawn with gradients in currentColor, so it follows the theme. */
+.z-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: calc(var(--z-control-padding-x) + 1.25rem);
+  background-image:
+    linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position:
+    calc(100% - var(--z-control-padding-x) - 5px) 50%,
+    calc(100% - var(--z-control-padding-x)) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+.z-select option {
+  background: var(--z-surface);
+  color: var(--z-text);
+}
+
+/* ── Checkboxes, radios and switches ─────────────────────────────────────── */
+
+.z-check,
+.z-switch {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: none;
+  margin: 0;
+  display: inline-grid;
+  place-content: center;
+  border: 1.5px solid var(--z-border-strong);
+  background: var(--z-bg);
+  cursor: pointer;
+  vertical-align: middle;
+  transition:
+    background-color var(--z-duration-fast) var(--z-ease-standard),
+    border-color var(--z-duration-fast) var(--z-ease-standard);
+}
+
+.z-check {
+  width: var(--z-control-check-size);
+  height: var(--z-control-check-size);
+  border-radius: 4px;
+}
+
+.z-check[type="radio"] {
+  border-radius: 50%;
+}
+
+.z-check::before {
+  content: "";
+  width: 0.62em;
+  height: 0.62em;
+  background: var(--z-on-accent);
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+  transform: scale(0);
+  transition: transform var(--z-duration-fast) var(--z-ease-spring);
+}
+
+.z-check[type="radio"]::before {
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 50%;
+  clip-path: none;
+}
+
+.z-check:hover,
+.z-switch:hover {
+  border-color: var(--z-muted);
+}
+
+/* The accent fill is only 2.2:1 on the light ground, so the checked
+   boundary is the button edge (checked in tokens.json for both themes). */
+.z-check:checked,
+.z-check:indeterminate {
+  background: var(--z-accent);
+  border-color: var(--z-button-edge);
+}
+
+.z-check:checked::before {
+  transform: scale(1);
+}
+
+.z-check:indeterminate::before {
+  clip-path: inset(38% 0 38% 0);
+  transform: scale(1);
+}
+
+.z-switch {
+  position: relative;
+  width: var(--z-control-switch-width);
+  height: var(--z-control-switch-height);
+  border-radius: var(--z-radius-full);
+  background: var(--z-surface-raised);
+  place-content: center start;
+  padding: 2px;
+}
+
+.z-switch::before {
+  content: "";
+  width: calc(var(--z-control-switch-height) - 8px);
+  height: calc(var(--z-control-switch-height) - 8px);
+  border-radius: 50%;
+  background: var(--z-muted);
+  transition:
+    transform var(--z-duration-base) var(--z-ease-spring),
+    background-color var(--z-duration-fast) var(--z-ease-standard);
+}
+
+.z-switch:checked {
+  background: var(--z-accent);
+  border-color: var(--z-button-edge);
+}
+
+.z-switch:checked::before {
+  background: var(--z-on-accent);
+  transform: translateX(calc(var(--z-control-switch-width) - var(--z-control-switch-height)));
+}
+
+.z-check:disabled,
+.z-switch:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* A label wrapping a check, radio or switch and its text. */
+.z-check-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--z-space-2);
+  color: var(--z-text);
+  cursor: pointer;
+}
+
+/* ── Radio / checkbox cards ──────────────────────────────────────────────
+   <label class="z-choice"><input class="z-check" type="radio" …> …</label> */
+
+.z-choice {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--z-space-3);
+  padding: var(--z-space-4);
+  border: var(--z-control-border-width) solid var(--z-border-strong);
+  border-radius: var(--z-radius-md);
+  background: var(--z-surface);
+  color: var(--z-text);
+  cursor: pointer;
+  transition:
+    border-color var(--z-duration-fast) var(--z-ease-standard),
+    background-color var(--z-duration-fast) var(--z-ease-standard),
+    box-shadow var(--z-duration-fast) var(--z-ease-standard);
+}
+
+.z-choice:hover {
+  border-color: var(--z-muted);
+  background: var(--z-surface-raised);
+}
+
+.z-choice:has(input:checked),
+.z-choice[aria-checked="true"],
+.z-choice.is-selected {
+  border-color: var(--z-accent-text);
+  background: color-mix(in srgb, var(--z-accent) 9%, var(--z-surface));
+  box-shadow: inset 0 0 0 1px var(--z-accent-text);
+}
+
+.z-choice:has(input:focus-visible) {
+  outline: 2px solid var(--z-focus);
+  outline-offset: 2px;
+}
+
+.z-choice:has(input:disabled),
+.z-choice[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Segmented controls and tabs ─────────────────────────────────────────
+   Segmented: radios inside labels, or buttons with aria-pressed / aria-selected.
+   Tabs: role="tab" buttons with aria-selected. */
+
+.z-segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin: 0;
+  padding: 3px;
+  border: var(--z-control-border-width) solid var(--z-border-strong);
+  border-radius: calc(var(--z-control-radius) + 3px);
+  background: var(--z-bg);
+  min-inline-size: 0;
+}
+
+.z-segmented > :is(button, label, a) {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--z-space-1);
+  min-height: calc(var(--z-control-height-sm) - 6px);
+  padding: 0 var(--z-space-3);
+  border: 0;
+  border-radius: var(--z-control-radius);
+  background: transparent;
+  color: var(--z-muted);
+  font: var(--z-weight-semibold) var(--z-size-sm) / 1.2 var(--z-font-text);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--z-duration-fast) var(--z-ease-standard),
+    color var(--z-duration-fast) var(--z-ease-standard);
+}
+
+.z-segmented > :is(button, label, a):hover {
+  color: var(--z-heading);
+  background: var(--z-surface-raised);
+}
+
+.z-segmented > label > input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.z-segmented > :is([aria-pressed="true"], [aria-selected="true"], [aria-current="true"], :has(> input:checked)) {
+  background: var(--z-accent);
+  color: var(--z-on-accent);
+}
+
+.z-segmented > label:has(> input:focus-visible) {
+  outline: 2px solid var(--z-focus);
+  outline-offset: 2px;
+}
+
+.z-tabs {
+  display: flex;
+  gap: var(--z-space-1);
+  border-bottom: var(--z-control-border-width) solid var(--z-border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.z-tabs > [role="tab"],
+.z-tabs > button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--z-space-1);
+  min-height: var(--z-control-height-sm);
+  padding: 0 var(--z-space-3);
+  border: 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  background: transparent;
+  color: var(--z-muted);
+  font: var(--z-weight-semibold) var(--z-size-sm) / 1.2 var(--z-font-text);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color var(--z-duration-fast) var(--z-ease-standard),
+    border-color var(--z-duration-fast) var(--z-ease-standard);
+}
+
+.z-tabs > :is([role="tab"], button):hover {
+  color: var(--z-heading);
+}
+
+.z-tabs > :is([aria-selected="true"], [aria-pressed="true"]) {
+  color: var(--z-heading);
+  border-bottom-color: var(--z-accent-text);
+}
+
+/* ── Copy button ─────────────────────────────────────────────────────────
+   <button class="z-copy" type="button" aria-label="Copy">…icon… <span class="z-copy__label">Copy</span></button>
+   Set data-copied while the confirmation shows, and announce it in an
+   aria-live region. */
+
+.z-copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--z-space-1);
+  min-height: var(--z-control-height-sm);
+  min-width: var(--z-control-height-sm);
+  padding: 0 var(--z-space-2);
+  border: var(--z-control-border-width) solid var(--z-border-strong);
+  border-radius: var(--z-control-radius);
+  background: var(--z-surface);
+  color: var(--z-text);
+  font: var(--z-weight-semibold) var(--z-size-xs) / 1 var(--z-font-text);
+  cursor: pointer;
+  transition:
+    background-color var(--z-duration-fast) var(--z-ease-standard),
+    color var(--z-duration-fast) var(--z-ease-standard),
+    border-color var(--z-duration-fast) var(--z-ease-standard);
+}
+
+.z-copy:hover {
+  background: var(--z-surface-raised);
+  color: var(--z-heading);
+}
+
+.z-copy[data-copied] {
+  color: var(--z-success);
+  border-color: var(--z-success);
+}
+
+/* ── Menus (dropdown panels) ─────────────────────────────────────────── */
+
+.z-menu {
+  min-width: 12rem;
+  padding: var(--z-space-2);
+  border: var(--z-control-border-width) solid var(--z-border);
+  border-radius: var(--z-radius-md);
+  background: var(--z-surface);
+  box-shadow: var(--z-shadow-lg);
+}
+
+.z-menu__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--z-space-3);
+  width: 100%;
+  min-height: var(--z-control-height-sm);
+  padding: 0 var(--z-space-3);
+  border: 0;
+  border-radius: var(--z-control-radius);
+  background: transparent;
+  color: var(--z-text);
+  font: var(--z-weight-medium) var(--z-size-sm) / 1.3 var(--z-font-text);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--z-duration-fast) var(--z-ease-standard),
+    color var(--z-duration-fast) var(--z-ease-standard);
+}
+
+.z-menu__item:hover,
+.z-menu__item:focus-visible {
+  background: var(--z-surface-raised);
+  color: var(--z-accent-text);
+}
+
+.z-menu__item:focus-visible {
+  outline-offset: -2px;
+}
+
+.z-menu__item[aria-current="page"],
+.z-menu__item[aria-checked="true"] {
+  color: var(--z-accent-text);
+}
+
+/* ── Tooltip ─────────────────────────────────────────────────────────────
+   <span class="z-tooltip" data-tip="Text">…</span>, shown on hover and focus. */
+
+.z-tooltip {
+  position: relative;
+}
+
+.z-tooltip::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 6px);
+  z-index: 50;
+  width: max-content;
+  max-width: 16rem;
+  padding: var(--z-space-1) var(--z-space-2);
+  border: var(--z-control-border-width) solid var(--z-border);
+  border-radius: var(--z-control-radius);
+  background: var(--z-surface-raised);
+  color: var(--z-text);
+  box-shadow: var(--z-shadow-md);
+  font: var(--z-weight-medium) var(--z-size-xs) / 1.4 var(--z-font-text);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 2px);
+  transition:
+    opacity var(--z-duration-fast) var(--z-ease-standard),
+    transform var(--z-duration-fast) var(--z-ease-standard);
+}
+
+.z-tooltip:hover::after,
+.z-tooltip:focus-visible::after,
+.z-tooltip:focus-within::after {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* ── Keyboard hint ───────────────────────────────────────────────────── */
+
+.z-kbd {
+  display: inline-block;
+  min-width: 1.5em;
+  padding: 0.1em 0.4em;
+  border: var(--z-control-border-width) solid var(--z-border-strong);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--z-surface);
+  color: var(--z-text);
+  font: var(--z-weight-semibold) var(--z-size-xs) / 1.3 var(--z-font-mono);
+  text-align: center;
+}
+
+/* ── Touch targets ───────────────────────────────────────────────────────
+   On coarse pointers every control is at least target-min tall (and wide
+   where it is a square). Checks and switches keep their drawn size; give
+   their label (.z-check-label) the target instead. */
+
+@media (pointer: coarse) {
+  .z-btn,
+  .z-copy,
+  .z-input,
+  .z-select,
+  .z-menu__item,
+  .z-tabs > :is([role="tab"], button),
+  .z-segmented > :is(button, label, a),
+  .z-check-label {
+    min-height: var(--z-control-target-min);
+  }
+
+  .z-btn--icon,
+  .z-copy {
+    min-width: var(--z-control-target-min);
+  }
+}
+
 *,*::before,*::after{box-sizing:border-box}
 body{margin:0;background:var(--z-bg);color:var(--z-text);font:400 var(--z-size-base)/var(--z-leading-body) var(--z-font-text)}
 main{max-width:1400px;margin:0 auto;padding:var(--z-space-8) var(--z-layout-gutter) var(--z-space-24)}
@@ -466,6 +1094,7 @@ p{max-width:var(--z-layout-prose)}
 .fonts{display:grid;gap:var(--z-space-4)}
 .fonts>div{background:var(--z-surface);border:1px solid var(--z-border);border-radius:var(--z-radius-md);padding:var(--z-space-4)}
 .btns{display:flex;flex-wrap:wrap;gap:var(--z-space-4);align-items:center;padding:var(--z-space-4) 0}
+.ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--z-space-4);padding:var(--z-space-4) 0}
 .card{background:var(--z-surface);border:1px solid var(--z-border);border-radius:var(--z-radius-lg);padding:var(--z-space-6);box-shadow:var(--z-shadow-md);margin-top:var(--z-space-4)}
 .code{background:var(--z-code-bg);color:var(--z-code-fg);border:1px solid var(--z-border);border-radius:var(--z-radius-md);padding:var(--z-space-4);overflow-x:auto;font:var(--z-size-sm)/var(--z-leading-code) var(--z-font-mono)}
 .code .k{color:var(--z-accent-text)}.code .s{color:var(--z-code-accent)}.code .c{color:var(--z-muted)}
@@ -488,7 +1117,7 @@ p{max-width:var(--z-layout-prose)}
 <main>
 <p class="muted"><code>design/dist/preview/index.html</code>, generated by <code>deno task build</code> from <code>tokens.json</code>. Each section renders twice: the dark ground (default) and the light theme.</p>
 <h1>Zentinel design tokens</h1>
-<p>Shisa orange <code>#f68d31</code> and plum <code>#9b4d8a</code> on a plum-tinted dark ground. Contrast gate: <b>dark: 61/61 pass, lowest 3.21:1 · light: 61/61 pass, lowest 3.45:1</b>.</p>
+<p>Shisa orange <code>#f68d31</code> and plum <code>#9b4d8a</code> on a plum-tinted dark ground. Contrast gate: <b>dark: 63/63 pass, lowest 3.21:1 · light: 63/63 pass, lowest 3.45:1</b>.</p>
 
 <h2>Marks</h2>
 <p class="note">The shisa exists only as a raster illustration (1024 px PNG). The lockups below are <b>interim</b>: the raster disc next to a vector wordmark. A vector redraw of the mark is still needed before mono lockups, an SVG favicon and small-size marks can exist. See <code>marks/PROVENANCE.md</code>.</p>
@@ -573,6 +1202,86 @@ p{max-width:var(--z-layout-prose)}
 <p style="color:var(--z-info)">info: config reloaded on SIGHUP</p>
 </div></div></div>
 
+<h2>Controls</h2>
+<p class="muted">From <code>components/controls.css</code>. Every control takes the focus ring from <code>--z-focus</code>, grows to <code>--z-control-target-min</code> on touch screens, and its transitions drop to zero under reduced motion.</p>
+<div class="pair"><div class="panel" data-theme="dark"><p class="tag">dark</p><div class="btns">
+<button class="z-btn z-btn--sm" type="button">Small</button>
+<button class="z-btn" type="button">Medium</button>
+<button class="z-btn z-btn--lg" type="button">Large</button>
+<button class="z-btn z-btn--quiet z-btn--sm" type="button">Quiet</button>
+<button class="z-btn z-btn--ghost z-btn--sm" type="button">Ghost</button>
+<button class="z-btn" type="button" disabled>Disabled</button>
+<button class="z-btn" type="button" aria-busy="true">Running</button>
+</div>
+<div class="ctl">
+<label class="z-field"><span class="z-label">Host</span><input class="z-input" placeholder="example.com"><span class="z-hint">Matched against the Host header.</span></label>
+<label class="z-field"><span class="z-label">Method</span><select class="z-select"><option>GET</option><option>POST</option></select></label>
+<label class="z-field"><span class="z-label">Path</span><input class="z-input z-input--mono" aria-invalid="true" value="api/users"><span class="z-hint z-hint--error">Paths start with /.</span></label>
+<label class="z-field"><span class="z-label">Config</span><textarea class="z-textarea z-textarea--mono" rows="3">system {
+    worker-threads 4
+}</textarea></label>
+</div>
+<div class="btns">
+<label class="z-check-label"><input class="z-check" type="checkbox" checked> WAF</label>
+<label class="z-check-label"><input class="z-check" type="checkbox"> Rate limit</label>
+<label class="z-check-label"><input class="z-check" type="radio" name="r-dark" checked> Script</label>
+<label class="z-check-label"><input class="z-check" type="radio" name="r-dark"> Cargo</label>
+<label class="z-check-label"><input class="z-switch" type="checkbox" role="switch" checked> Fail open</label>
+</div>
+<div class="btns">
+<fieldset class="z-segmented"><legend style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Theme</legend><label><input type="radio" name="s-dark" checked>System</label><label><input type="radio" name="s-dark">Light</label><label><input type="radio" name="s-dark">Dark</label></fieldset>
+<div class="z-tabs" role="tablist"><button role="tab" aria-selected="true">Builder</button><button role="tab" aria-selected="false">Raw</button><button role="tab" aria-selected="false">Agents</button></div>
+</div>
+<div class="ctl">
+<label class="z-choice"><input class="z-check" type="radio" name="c-dark" checked><span><b>Install script</b><br><span class="muted">One-line installer for Linux and macOS</span></span></label>
+<label class="z-choice"><input class="z-check" type="radio" name="c-dark"><span><b>Cargo</b><br><span class="muted">Build from crates.io</span></span></label>
+</div>
+<div class="btns">
+<button class="z-copy" type="button">Copy</button>
+<button class="z-copy" type="button" data-copied>Copied</button>
+<span class="z-tooltip" tabindex="0" data-tip="Runs the config in your browser">Hover me</span>
+<span><kbd class="z-kbd">Ctrl</kbd> + <kbd class="z-kbd">Enter</kbd></span>
+</div>
+<div class="z-menu" role="menu"><a class="z-menu__item" role="menuitem" href="#controls">Features</a><a class="z-menu__item" role="menuitem" href="#controls" aria-current="page">Playground</a><a class="z-menu__item" role="menuitem" href="#controls">Benchmarks</a></div></div><div class="panel" data-theme="light"><p class="tag">light</p><div class="btns">
+<button class="z-btn z-btn--sm" type="button">Small</button>
+<button class="z-btn" type="button">Medium</button>
+<button class="z-btn z-btn--lg" type="button">Large</button>
+<button class="z-btn z-btn--quiet z-btn--sm" type="button">Quiet</button>
+<button class="z-btn z-btn--ghost z-btn--sm" type="button">Ghost</button>
+<button class="z-btn" type="button" disabled>Disabled</button>
+<button class="z-btn" type="button" aria-busy="true">Running</button>
+</div>
+<div class="ctl">
+<label class="z-field"><span class="z-label">Host</span><input class="z-input" placeholder="example.com"><span class="z-hint">Matched against the Host header.</span></label>
+<label class="z-field"><span class="z-label">Method</span><select class="z-select"><option>GET</option><option>POST</option></select></label>
+<label class="z-field"><span class="z-label">Path</span><input class="z-input z-input--mono" aria-invalid="true" value="api/users"><span class="z-hint z-hint--error">Paths start with /.</span></label>
+<label class="z-field"><span class="z-label">Config</span><textarea class="z-textarea z-textarea--mono" rows="3">system {
+    worker-threads 4
+}</textarea></label>
+</div>
+<div class="btns">
+<label class="z-check-label"><input class="z-check" type="checkbox" checked> WAF</label>
+<label class="z-check-label"><input class="z-check" type="checkbox"> Rate limit</label>
+<label class="z-check-label"><input class="z-check" type="radio" name="r-light" checked> Script</label>
+<label class="z-check-label"><input class="z-check" type="radio" name="r-light"> Cargo</label>
+<label class="z-check-label"><input class="z-switch" type="checkbox" role="switch" checked> Fail open</label>
+</div>
+<div class="btns">
+<fieldset class="z-segmented"><legend style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Theme</legend><label><input type="radio" name="s-light" checked>System</label><label><input type="radio" name="s-light">Light</label><label><input type="radio" name="s-light">Dark</label></fieldset>
+<div class="z-tabs" role="tablist"><button role="tab" aria-selected="true">Builder</button><button role="tab" aria-selected="false">Raw</button><button role="tab" aria-selected="false">Agents</button></div>
+</div>
+<div class="ctl">
+<label class="z-choice"><input class="z-check" type="radio" name="c-light" checked><span><b>Install script</b><br><span class="muted">One-line installer for Linux and macOS</span></span></label>
+<label class="z-choice"><input class="z-check" type="radio" name="c-light"><span><b>Cargo</b><br><span class="muted">Build from crates.io</span></span></label>
+</div>
+<div class="btns">
+<button class="z-copy" type="button">Copy</button>
+<button class="z-copy" type="button" data-copied>Copied</button>
+<span class="z-tooltip" tabindex="0" data-tip="Runs the config in your browser">Hover me</span>
+<span><kbd class="z-kbd">Ctrl</kbd> + <kbd class="z-kbd">Enter</kbd></span>
+</div>
+<div class="z-menu" role="menu"><a class="z-menu__item" role="menuitem" href="#controls">Features</a><a class="z-menu__item" role="menuitem" href="#controls" aria-current="page">Playground</a><a class="z-menu__item" role="menuitem" href="#controls">Benchmarks</a></div></div></div>
+
 <h2>Typography</h2>
 <p>Display: <b>Unbounded</b>. Text: <b>Atkinson Hyperlegible Next</b>. Mono: <b>Atkinson Hyperlegible Mono</b>. All SIL OFL 1.1, self-hosted from <code>fonts/</code>.</p>
 <div class="pair"><div class="panel" data-theme="dark"><p class="tag">dark</p><div class="fonts">
@@ -589,7 +1298,7 @@ p{max-width:var(--z-layout-prose)}
 
 <h2>Contrast</h2>
 <p class="muted">Every pairing declared in <code>tokens.json → contrast</code>, checked by the build (WCAG 2.x: text 4.5:1, large/UI 3:1). A failure stops the build.</p>
-<div class="pair"><div class="panel" data-theme="dark"><p class="tag">dark</p><table class="ct"><thead><tr><th></th><th>Foreground</th><th>Background</th><th>Ratio</th><th>Needs</th><th></th></tr></thead><tbody><tr><td><span class="sample" style="color:#f3edf2;background:#160d15">Aa</span></td><td>text<br><code>#f3edf2</code></td><td>bg<br><code>#160d15</code></td><td class="num">16.51</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#f3edf2;background:#1f161e">Aa</span></td><td>text<br><code>#f3edf2</code></td><td>surface<br><code>#1f161e</code></td><td class="num">15.28</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#f3edf2;background:#2a1f28">Aa</span></td><td>text<br><code>#f3edf2</code></td><td>surface-raised<br><code>#2a1f28</code></td><td class="num">13.74</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#f3edf2;background:#1f161e">Aa</span></td><td>text<br><code>#f3edf2</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">15.28</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#faf6fa;background:#160d15">Aa</span></td><td>heading<br><code>#faf6fa</code></td><td>bg<br><code>#160d15</code></td><td class="num">17.80</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#faf6fa;background:#1f161e">Aa</span></td><td>heading<br><code>#faf6fa</code></td><td>surface<br><code>#1f161e</code></td><td class="num">16.47</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#faf6fa;background:#2a1f28">Aa</span></td><td>heading<br><code>#faf6fa</code></td><td>surface-raised<br><code>#2a1f28</code></td><td class="num">14.81</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#faf6fa;background:#1f161e">Aa</span></td><td>heading<br><code>#faf6fa</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">16.47</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#aca0ab;background:#160d15">Aa</span></td><td>muted<br><code>#aca0ab</code></td><td>bg<br><code>#160d15</code></td><td class="num">7.59</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#aca0ab;background:#1f161e">Aa</span></td><td>muted<br><code>#aca0ab</code></td><td>surface<br><code>#1f161e</code></td><td class="num">7.02</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#aca0ab;background:#2a1f28">Aa</span></td><td>muted<br><code>#aca0ab</code></td><td>surface-raised<br><code>#2a1f28</code></td><td class="num">6.32</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#aca0ab;background:#1f161e">Aa</span></td><td>muted<br><code>#aca0ab</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">7.02</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#f68d31;background:#160d15">Aa</span></td><td>accent-text<br><code>#f68d31</code></td><td>bg<br><code>#160d15</code></td><td class="num">7.96</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#f68d31;background:#1f161e">Aa</span></td><td>accent-text<br><code>#f68d31</code></td><td>surface<br><code>#1f161e</code></td><td class="num">7.36</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#f68d31;background:#2a1f28">Aa</span></td><td>accent-text<br><code>#f68d31</code></td><td>surface-raised<br><code>#2a1f28</code></td><td class="num">6.62</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#f68d31;background:#1f161e">Aa</span></td><td>accent-text<br><code>#f68d31</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">7.36</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#e9a9d9;background:#160d15">Aa</span></td><td>accent-2-text<br><code>#e9a9d9</code></td><td>bg<br><code>#160d15</code></td><td class="num">10.11</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#e9a9d9;background:#1f161e">Aa</span></td><td>accent-2-text<br><code>#e9a9d9</code></td><td>surface<br><code>#1f161e</code></td><td class="num">9.35</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#e9a9d9;background:#2a1f28">Aa</span></td><td>accent-2-text<br><code>#e9a9d9</code></td><td>surface-raised<br><code>#2a1f28</code></td><td class="num">8.41</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#e9a9d9;background:#1f161e">Aa</span></td><td>accent-2-text<br><code>#e9a9d9</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">9.35</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#ffb579;background:#160d15">Aa</span></td><td>link<br><code>#ffb579</code></td><td>bg<br><code>#160d15</code></td><td class="num">11.01</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#ffb579;background:#1f161e">Aa</span></td><td>link<br><code>#ffb579</code></td><td>surface<br><code>#1f161e</code></td><td class="num">10.18</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#ffb579;background:#2a1f28">Aa</span></td><td>link<br><code>#ffb579</code></td><td>surface-raised<br><code>#2a1f28</code></td><td class="num">9.16</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#ffb579;background:#1f161e">Aa</span></td><td>link<br><code>#ffb579</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">10.18</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#fed3ae;background:#160d15">Aa</span></td><td>link-hover<br><code>#fed3ae</code></td><td>bg<br><code>#160d15</code></td><td class="num">13.74</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#fed3ae;background:#1f161e">Aa</span></td><td>link-hover<br><code>#fed3ae</code></td><td>surface<br><code>#1f161e</code></td><td class="num">12.71</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#fed3ae;background:#2a1f28">Aa</span></td><td>link-hover<br><code>#fed3ae</code></td><td>surface-raised<br><code>#2a1f28</code></td><td class="num">11.43</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#fed3ae;background:#1f161e">Aa</span></td><td>link-hover<br><code>#fed3ae</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">12.71</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#61cb7c;background:#160d15">Aa</span></td><td>success<br><code>#61cb7c</code></td><td>bg<br><code>#160d15</code></td><td class="num">9.38</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#61cb7c;background:#1f161e">Aa</span></td><td>success<br><code>#61cb7c</code></td><td>surface<br><code>#1f161e</code></td><td class="num">8.68</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#61cb7c;background:#2a1f28">Aa</span></td><td>success<br><code>#61cb7c</code></td><td>surface-raised<br><code>#2a1f28</code></td><td class="num">7.80</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#61cb7c;background:#1f161e">Aa</span></td><td>success<br><code>#61cb7c</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">8.68</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#edc05d;background:#160d15">Aa</span></td><td>warn<br><code>#edc05d</code></td><td>bg<br><code>#160d15</code></td><td class="num">11.16</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#edc05d;background:#1f161e">Aa</span></td><td>warn<br><code>#edc05d</code></td><td>surface<br><code>#1f161e</code></td><td class="num">10.32</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#edc05d;background:#2a1f28">Aa</span></td><td>warn<br><code>#edc05d</code></td><td>surface-raised<br><code>#2a1f28</code></td><td class="num">9.28</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#edc05d;background:#1f161e">Aa</span></td><td>warn<br><code>#edc05d</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">10.32</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#ff8a83;background:#160d15">Aa</span></td><td>danger<br><code>#ff8a83</code></td><td>bg<br><code>#160d15</code></td><td class="num">8.36</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#ff8a83;background:#1f161e">Aa</span></td><td>danger<br><code>#ff8a83</code></td><td>surface<br><code>#1f161e</code></td><td class="num">7.73</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#ff8a83;background:#2a1f28">Aa</span></td><td>danger<br><code>#ff8a83</code></td><td>surface-raised<br><code>#2a1f28</code></td><td class="num">6.95</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#ff8a83;background:#1f161e">Aa</span></td><td>danger<br><code>#ff8a83</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">7.73</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#6fb6fe;background:#160d15">Aa</span></td><td>info<br><code>#6fb6fe</code></td><td>bg<br><code>#160d15</code></td><td class="num">8.89</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#6fb6fe;background:#1f161e">Aa</span></td><td>info<br><code>#6fb6fe</code></td><td>surface<br><code>#1f161e</code></td><td class="num">8.22</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#6fb6fe;background:#2a1f28">Aa</span></td><td>info<br><code>#6fb6fe</code></td><td>surface-raised<br><code>#2a1f28</code></td><td class="num">7.39</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#6fb6fe;background:#1f161e">Aa</span></td><td>info<br><code>#6fb6fe</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">8.22</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#f3edf2;background:#1f161e">Aa</span></td><td>code-fg<br><code>#f3edf2</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">15.28</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#fed3ae;background:#1f161e">Aa</span></td><td>code-accent<br><code>#fed3ae</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">12.71</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#160d15;background:#f68d31">Aa</span></td><td>on-accent<br><code>#160d15</code></td><td>accent<br><code>#f68d31</code></td><td class="num">7.96</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#160d15;background:#ffb579">Aa</span></td><td>on-accent<br><code>#160d15</code></td><td>accent-hover<br><code>#ffb579</code></td><td class="num">11.01</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#faf6fa;background:#9b4d8a">Aa</span></td><td>on-accent-2<br><code>#faf6fa</code></td><td>accent-2<br><code>#9b4d8a</code></td><td class="num">5.14</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#faf6fa;background:#803a71">Aa</span></td><td>on-accent-2<br><code>#faf6fa</code></td><td>accent-2-hover<br><code>#803a71</code></td><td class="num">7.11</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#faf6fa;background:#803a71">Aa</span></td><td>selection-fg<br><code>#faf6fa</code></td><td>selection-bg<br><code>#803a71</code></td><td class="num">7.11</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#d387c1;background:#160d15">Aa</span></td><td>focus<br><code>#d387c1</code></td><td>bg<br><code>#160d15</code></td><td class="num">7.26</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#d387c1;background:#1f161e">Aa</span></td><td>focus<br><code>#d387c1</code></td><td>surface<br><code>#1f161e</code></td><td class="num">6.72</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#d387c1;background:#2a1f28">Aa</span></td><td>focus<br><code>#d387c1</code></td><td>surface-raised<br><code>#2a1f28</code></td><td class="num">6.04</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#887c87;background:#160d15">Aa</span></td><td>border-strong<br><code>#887c87</code></td><td>bg<br><code>#160d15</code></td><td class="num">4.79</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#887c87;background:#1f161e">Aa</span></td><td>border-strong<br><code>#887c87</code></td><td>surface<br><code>#1f161e</code></td><td class="num">4.43</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#887c87;background:#2a1f28">Aa</span></td><td>border-strong<br><code>#887c87</code></td><td>surface-raised<br><code>#2a1f28</code></td><td class="num">3.98</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#f68d31;background:#160d15">Aa</span></td><td>accent<br><code>#f68d31</code></td><td>bg<br><code>#160d15</code></td><td class="num">7.96</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#f68d31;background:#1f161e">Aa</span></td><td>accent<br><code>#f68d31</code></td><td>surface<br><code>#1f161e</code></td><td class="num">7.36</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4d8a;background:#160d15">Aa</span></td><td>accent-2<br><code>#9b4d8a</code></td><td>bg<br><code>#160d15</code></td><td class="num">3.47</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4d8a;background:#1f161e">Aa</span></td><td>accent-2<br><code>#9b4d8a</code></td><td>surface<br><code>#1f161e</code></td><td class="num">3.21</td><td>ui ≥ 3</td><td>pass</td></tr></tbody></table></div><div class="panel" data-theme="light"><p class="tag">light</p><table class="ct"><thead><tr><th></th><th>Foreground</th><th>Background</th><th>Ratio</th><th>Needs</th><th></th></tr></thead><tbody><tr><td><span class="sample" style="color:#1f161e;background:#faf6fa">Aa</span></td><td>text<br><code>#1f161e</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">16.47</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#1f161e;background:#ffffff">Aa</span></td><td>text<br><code>#1f161e</code></td><td>surface<br><code>#ffffff</code></td><td class="num">17.62</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#1f161e;background:#f3edf2">Aa</span></td><td>text<br><code>#1f161e</code></td><td>surface-raised<br><code>#f3edf2</code></td><td class="num">15.28</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#1f161e;background:#f3edf2">Aa</span></td><td>text<br><code>#1f161e</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">15.28</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#160d15;background:#faf6fa">Aa</span></td><td>heading<br><code>#160d15</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">17.80</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#160d15;background:#ffffff">Aa</span></td><td>heading<br><code>#160d15</code></td><td>surface<br><code>#ffffff</code></td><td class="num">19.05</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#160d15;background:#f3edf2">Aa</span></td><td>heading<br><code>#160d15</code></td><td>surface-raised<br><code>#f3edf2</code></td><td class="num">16.51</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#160d15;background:#f3edf2">Aa</span></td><td>heading<br><code>#160d15</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">16.51</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#695c67;background:#faf6fa">Aa</span></td><td>muted<br><code>#695c67</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">5.90</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#695c67;background:#ffffff">Aa</span></td><td>muted<br><code>#695c67</code></td><td>surface<br><code>#ffffff</code></td><td class="num">6.31</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#695c67;background:#f3edf2">Aa</span></td><td>muted<br><code>#695c67</code></td><td>surface-raised<br><code>#f3edf2</code></td><td class="num">5.47</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#695c67;background:#f3edf2">Aa</span></td><td>muted<br><code>#695c67</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">5.47</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4804;background:#faf6fa">Aa</span></td><td>accent-text<br><code>#9b4804</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">5.91</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4804;background:#ffffff">Aa</span></td><td>accent-text<br><code>#9b4804</code></td><td>surface<br><code>#ffffff</code></td><td class="num">6.32</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4804;background:#f3edf2">Aa</span></td><td>accent-text<br><code>#9b4804</code></td><td>surface-raised<br><code>#f3edf2</code></td><td class="num">5.48</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4804;background:#f3edf2">Aa</span></td><td>accent-text<br><code>#9b4804</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">5.48</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4d8a;background:#faf6fa">Aa</span></td><td>accent-2-text<br><code>#9b4d8a</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">5.14</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4d8a;background:#ffffff">Aa</span></td><td>accent-2-text<br><code>#9b4d8a</code></td><td>surface<br><code>#ffffff</code></td><td class="num">5.49</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4d8a;background:#f3edf2">Aa</span></td><td>accent-2-text<br><code>#9b4d8a</code></td><td>surface-raised<br><code>#f3edf2</code></td><td class="num">4.76</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4d8a;background:#f3edf2">Aa</span></td><td>accent-2-text<br><code>#9b4d8a</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">4.76</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4804;background:#faf6fa">Aa</span></td><td>link<br><code>#9b4804</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">5.91</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4804;background:#ffffff">Aa</span></td><td>link<br><code>#9b4804</code></td><td>surface<br><code>#ffffff</code></td><td class="num">6.32</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4804;background:#f3edf2">Aa</span></td><td>link<br><code>#9b4804</code></td><td>surface-raised<br><code>#f3edf2</code></td><td class="num">5.48</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4804;background:#f3edf2">Aa</span></td><td>link<br><code>#9b4804</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">5.48</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#7c3602;background:#faf6fa">Aa</span></td><td>link-hover<br><code>#7c3602</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">8.23</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#7c3602;background:#ffffff">Aa</span></td><td>link-hover<br><code>#7c3602</code></td><td>surface<br><code>#ffffff</code></td><td class="num">8.80</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#7c3602;background:#f3edf2">Aa</span></td><td>link-hover<br><code>#7c3602</code></td><td>surface-raised<br><code>#f3edf2</code></td><td class="num">7.63</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#7c3602;background:#f3edf2">Aa</span></td><td>link-hover<br><code>#7c3602</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">7.63</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#177739;background:#faf6fa">Aa</span></td><td>success<br><code>#177739</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">5.26</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#177739;background:#ffffff">Aa</span></td><td>success<br><code>#177739</code></td><td>surface<br><code>#ffffff</code></td><td class="num">5.62</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#177739;background:#f3edf2">Aa</span></td><td>success<br><code>#177739</code></td><td>surface-raised<br><code>#f3edf2</code></td><td class="num">4.88</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#177739;background:#f3edf2">Aa</span></td><td>success<br><code>#177739</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">4.88</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#7e5e01;background:#faf6fa">Aa</span></td><td>warn<br><code>#7e5e01</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">5.63</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#7e5e01;background:#ffffff">Aa</span></td><td>warn<br><code>#7e5e01</code></td><td>surface<br><code>#ffffff</code></td><td class="num">6.02</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#7e5e01;background:#f3edf2">Aa</span></td><td>warn<br><code>#7e5e01</code></td><td>surface-raised<br><code>#f3edf2</code></td><td class="num">5.22</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#7e5e01;background:#f3edf2">Aa</span></td><td>warn<br><code>#7e5e01</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">5.22</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#ac3030;background:#faf6fa">Aa</span></td><td>danger<br><code>#ac3030</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">6.10</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#ac3030;background:#ffffff">Aa</span></td><td>danger<br><code>#ac3030</code></td><td>surface<br><code>#ffffff</code></td><td class="num">6.52</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#ac3030;background:#f3edf2">Aa</span></td><td>danger<br><code>#ac3030</code></td><td>surface-raised<br><code>#f3edf2</code></td><td class="num">5.65</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#ac3030;background:#f3edf2">Aa</span></td><td>danger<br><code>#ac3030</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">5.65</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#2366a4;background:#faf6fa">Aa</span></td><td>info<br><code>#2366a4</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">5.59</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#2366a4;background:#ffffff">Aa</span></td><td>info<br><code>#2366a4</code></td><td>surface<br><code>#ffffff</code></td><td class="num">5.99</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#2366a4;background:#f3edf2">Aa</span></td><td>info<br><code>#2366a4</code></td><td>surface-raised<br><code>#f3edf2</code></td><td class="num">5.19</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#2366a4;background:#f3edf2">Aa</span></td><td>info<br><code>#2366a4</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">5.19</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#1f161e;background:#f3edf2">Aa</span></td><td>code-fg<br><code>#1f161e</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">15.28</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#803a71;background:#f3edf2">Aa</span></td><td>code-accent<br><code>#803a71</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">6.59</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#160d15;background:#f68d31">Aa</span></td><td>on-accent<br><code>#160d15</code></td><td>accent<br><code>#f68d31</code></td><td class="num">7.96</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#160d15;background:#ffb579">Aa</span></td><td>on-accent<br><code>#160d15</code></td><td>accent-hover<br><code>#ffb579</code></td><td class="num">11.01</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#faf6fa;background:#9b4d8a">Aa</span></td><td>on-accent-2<br><code>#faf6fa</code></td><td>accent-2<br><code>#9b4d8a</code></td><td class="num">5.14</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#faf6fa;background:#803a71">Aa</span></td><td>on-accent-2<br><code>#faf6fa</code></td><td>accent-2-hover<br><code>#803a71</code></td><td class="num">7.11</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#1f161e;background:#fed3ae">Aa</span></td><td>selection-fg<br><code>#1f161e</code></td><td>selection-bg<br><code>#fed3ae</code></td><td class="num">12.71</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4d8a;background:#faf6fa">Aa</span></td><td>focus<br><code>#9b4d8a</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">5.14</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4d8a;background:#ffffff">Aa</span></td><td>focus<br><code>#9b4d8a</code></td><td>surface<br><code>#ffffff</code></td><td class="num">5.49</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4d8a;background:#f3edf2">Aa</span></td><td>focus<br><code>#9b4d8a</code></td><td>surface-raised<br><code>#f3edf2</code></td><td class="num">4.76</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#887c87;background:#faf6fa">Aa</span></td><td>border-strong<br><code>#887c87</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">3.72</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#887c87;background:#ffffff">Aa</span></td><td>border-strong<br><code>#887c87</code></td><td>surface<br><code>#ffffff</code></td><td class="num">3.98</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#887c87;background:#f3edf2">Aa</span></td><td>border-strong<br><code>#887c87</code></td><td>surface-raised<br><code>#f3edf2</code></td><td class="num">3.45</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4804;background:#faf6fa">Aa</span></td><td>button-edge<br><code>#9b4804</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">5.91</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4804;background:#ffffff">Aa</span></td><td>button-edge<br><code>#9b4804</code></td><td>surface<br><code>#ffffff</code></td><td class="num">6.32</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#662c5a;background:#faf6fa">Aa</span></td><td>button-2-edge<br><code>#662c5a</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">9.47</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#662c5a;background:#ffffff">Aa</span></td><td>button-2-edge<br><code>#662c5a</code></td><td>surface<br><code>#ffffff</code></td><td class="num">10.13</td><td>ui ≥ 3</td><td>pass</td></tr></tbody></table></div></div>
+<div class="pair"><div class="panel" data-theme="dark"><p class="tag">dark</p><table class="ct"><thead><tr><th></th><th>Foreground</th><th>Background</th><th>Ratio</th><th>Needs</th><th></th></tr></thead><tbody><tr><td><span class="sample" style="color:#f3edf2;background:#160d15">Aa</span></td><td>text<br><code>#f3edf2</code></td><td>bg<br><code>#160d15</code></td><td class="num">16.51</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#f3edf2;background:#1f161e">Aa</span></td><td>text<br><code>#f3edf2</code></td><td>surface<br><code>#1f161e</code></td><td class="num">15.28</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#f3edf2;background:#2a1f28">Aa</span></td><td>text<br><code>#f3edf2</code></td><td>surface-raised<br><code>#2a1f28</code></td><td class="num">13.74</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#f3edf2;background:#1f161e">Aa</span></td><td>text<br><code>#f3edf2</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">15.28</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#faf6fa;background:#160d15">Aa</span></td><td>heading<br><code>#faf6fa</code></td><td>bg<br><code>#160d15</code></td><td class="num">17.80</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#faf6fa;background:#1f161e">Aa</span></td><td>heading<br><code>#faf6fa</code></td><td>surface<br><code>#1f161e</code></td><td class="num">16.47</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#faf6fa;background:#2a1f28">Aa</span></td><td>heading<br><code>#faf6fa</code></td><td>surface-raised<br><code>#2a1f28</code></td><td class="num">14.81</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#faf6fa;background:#1f161e">Aa</span></td><td>heading<br><code>#faf6fa</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">16.47</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#aca0ab;background:#160d15">Aa</span></td><td>muted<br><code>#aca0ab</code></td><td>bg<br><code>#160d15</code></td><td class="num">7.59</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#aca0ab;background:#1f161e">Aa</span></td><td>muted<br><code>#aca0ab</code></td><td>surface<br><code>#1f161e</code></td><td class="num">7.02</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#aca0ab;background:#2a1f28">Aa</span></td><td>muted<br><code>#aca0ab</code></td><td>surface-raised<br><code>#2a1f28</code></td><td class="num">6.32</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#aca0ab;background:#1f161e">Aa</span></td><td>muted<br><code>#aca0ab</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">7.02</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#f68d31;background:#160d15">Aa</span></td><td>accent-text<br><code>#f68d31</code></td><td>bg<br><code>#160d15</code></td><td class="num">7.96</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#f68d31;background:#1f161e">Aa</span></td><td>accent-text<br><code>#f68d31</code></td><td>surface<br><code>#1f161e</code></td><td class="num">7.36</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#f68d31;background:#2a1f28">Aa</span></td><td>accent-text<br><code>#f68d31</code></td><td>surface-raised<br><code>#2a1f28</code></td><td class="num">6.62</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#f68d31;background:#1f161e">Aa</span></td><td>accent-text<br><code>#f68d31</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">7.36</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#e9a9d9;background:#160d15">Aa</span></td><td>accent-2-text<br><code>#e9a9d9</code></td><td>bg<br><code>#160d15</code></td><td class="num">10.11</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#e9a9d9;background:#1f161e">Aa</span></td><td>accent-2-text<br><code>#e9a9d9</code></td><td>surface<br><code>#1f161e</code></td><td class="num">9.35</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#e9a9d9;background:#2a1f28">Aa</span></td><td>accent-2-text<br><code>#e9a9d9</code></td><td>surface-raised<br><code>#2a1f28</code></td><td class="num">8.41</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#e9a9d9;background:#1f161e">Aa</span></td><td>accent-2-text<br><code>#e9a9d9</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">9.35</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#ffb579;background:#160d15">Aa</span></td><td>link<br><code>#ffb579</code></td><td>bg<br><code>#160d15</code></td><td class="num">11.01</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#ffb579;background:#1f161e">Aa</span></td><td>link<br><code>#ffb579</code></td><td>surface<br><code>#1f161e</code></td><td class="num">10.18</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#ffb579;background:#2a1f28">Aa</span></td><td>link<br><code>#ffb579</code></td><td>surface-raised<br><code>#2a1f28</code></td><td class="num">9.16</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#ffb579;background:#1f161e">Aa</span></td><td>link<br><code>#ffb579</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">10.18</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#fed3ae;background:#160d15">Aa</span></td><td>link-hover<br><code>#fed3ae</code></td><td>bg<br><code>#160d15</code></td><td class="num">13.74</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#fed3ae;background:#1f161e">Aa</span></td><td>link-hover<br><code>#fed3ae</code></td><td>surface<br><code>#1f161e</code></td><td class="num">12.71</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#fed3ae;background:#2a1f28">Aa</span></td><td>link-hover<br><code>#fed3ae</code></td><td>surface-raised<br><code>#2a1f28</code></td><td class="num">11.43</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#fed3ae;background:#1f161e">Aa</span></td><td>link-hover<br><code>#fed3ae</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">12.71</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#61cb7c;background:#160d15">Aa</span></td><td>success<br><code>#61cb7c</code></td><td>bg<br><code>#160d15</code></td><td class="num">9.38</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#61cb7c;background:#1f161e">Aa</span></td><td>success<br><code>#61cb7c</code></td><td>surface<br><code>#1f161e</code></td><td class="num">8.68</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#61cb7c;background:#2a1f28">Aa</span></td><td>success<br><code>#61cb7c</code></td><td>surface-raised<br><code>#2a1f28</code></td><td class="num">7.80</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#61cb7c;background:#1f161e">Aa</span></td><td>success<br><code>#61cb7c</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">8.68</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#edc05d;background:#160d15">Aa</span></td><td>warn<br><code>#edc05d</code></td><td>bg<br><code>#160d15</code></td><td class="num">11.16</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#edc05d;background:#1f161e">Aa</span></td><td>warn<br><code>#edc05d</code></td><td>surface<br><code>#1f161e</code></td><td class="num">10.32</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#edc05d;background:#2a1f28">Aa</span></td><td>warn<br><code>#edc05d</code></td><td>surface-raised<br><code>#2a1f28</code></td><td class="num">9.28</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#edc05d;background:#1f161e">Aa</span></td><td>warn<br><code>#edc05d</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">10.32</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#ff8a83;background:#160d15">Aa</span></td><td>danger<br><code>#ff8a83</code></td><td>bg<br><code>#160d15</code></td><td class="num">8.36</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#ff8a83;background:#1f161e">Aa</span></td><td>danger<br><code>#ff8a83</code></td><td>surface<br><code>#1f161e</code></td><td class="num">7.73</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#ff8a83;background:#2a1f28">Aa</span></td><td>danger<br><code>#ff8a83</code></td><td>surface-raised<br><code>#2a1f28</code></td><td class="num">6.95</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#ff8a83;background:#1f161e">Aa</span></td><td>danger<br><code>#ff8a83</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">7.73</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#6fb6fe;background:#160d15">Aa</span></td><td>info<br><code>#6fb6fe</code></td><td>bg<br><code>#160d15</code></td><td class="num">8.89</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#6fb6fe;background:#1f161e">Aa</span></td><td>info<br><code>#6fb6fe</code></td><td>surface<br><code>#1f161e</code></td><td class="num">8.22</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#6fb6fe;background:#2a1f28">Aa</span></td><td>info<br><code>#6fb6fe</code></td><td>surface-raised<br><code>#2a1f28</code></td><td class="num">7.39</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#6fb6fe;background:#1f161e">Aa</span></td><td>info<br><code>#6fb6fe</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">8.22</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#f3edf2;background:#1f161e">Aa</span></td><td>code-fg<br><code>#f3edf2</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">15.28</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#fed3ae;background:#1f161e">Aa</span></td><td>code-accent<br><code>#fed3ae</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">12.71</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#160d15;background:#f68d31">Aa</span></td><td>on-accent<br><code>#160d15</code></td><td>accent<br><code>#f68d31</code></td><td class="num">7.96</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#160d15;background:#ffb579">Aa</span></td><td>on-accent<br><code>#160d15</code></td><td>accent-hover<br><code>#ffb579</code></td><td class="num">11.01</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#faf6fa;background:#9b4d8a">Aa</span></td><td>on-accent-2<br><code>#faf6fa</code></td><td>accent-2<br><code>#9b4d8a</code></td><td class="num">5.14</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#faf6fa;background:#803a71">Aa</span></td><td>on-accent-2<br><code>#faf6fa</code></td><td>accent-2-hover<br><code>#803a71</code></td><td class="num">7.11</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#faf6fa;background:#803a71">Aa</span></td><td>selection-fg<br><code>#faf6fa</code></td><td>selection-bg<br><code>#803a71</code></td><td class="num">7.11</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#d387c1;background:#160d15">Aa</span></td><td>focus<br><code>#d387c1</code></td><td>bg<br><code>#160d15</code></td><td class="num">7.26</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#d387c1;background:#1f161e">Aa</span></td><td>focus<br><code>#d387c1</code></td><td>surface<br><code>#1f161e</code></td><td class="num">6.72</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#d387c1;background:#2a1f28">Aa</span></td><td>focus<br><code>#d387c1</code></td><td>surface-raised<br><code>#2a1f28</code></td><td class="num">6.04</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#887c87;background:#160d15">Aa</span></td><td>border-strong<br><code>#887c87</code></td><td>bg<br><code>#160d15</code></td><td class="num">4.79</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#887c87;background:#1f161e">Aa</span></td><td>border-strong<br><code>#887c87</code></td><td>surface<br><code>#1f161e</code></td><td class="num">4.43</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#887c87;background:#2a1f28">Aa</span></td><td>border-strong<br><code>#887c87</code></td><td>surface-raised<br><code>#2a1f28</code></td><td class="num">3.98</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#d387c1;background:#1f161e">Aa</span></td><td>focus<br><code>#d387c1</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">6.72</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#887c87;background:#1f161e">Aa</span></td><td>border-strong<br><code>#887c87</code></td><td>code-bg<br><code>#1f161e</code></td><td class="num">4.43</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#f68d31;background:#160d15">Aa</span></td><td>accent<br><code>#f68d31</code></td><td>bg<br><code>#160d15</code></td><td class="num">7.96</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#f68d31;background:#1f161e">Aa</span></td><td>accent<br><code>#f68d31</code></td><td>surface<br><code>#1f161e</code></td><td class="num">7.36</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4d8a;background:#160d15">Aa</span></td><td>accent-2<br><code>#9b4d8a</code></td><td>bg<br><code>#160d15</code></td><td class="num">3.47</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4d8a;background:#1f161e">Aa</span></td><td>accent-2<br><code>#9b4d8a</code></td><td>surface<br><code>#1f161e</code></td><td class="num">3.21</td><td>ui ≥ 3</td><td>pass</td></tr></tbody></table></div><div class="panel" data-theme="light"><p class="tag">light</p><table class="ct"><thead><tr><th></th><th>Foreground</th><th>Background</th><th>Ratio</th><th>Needs</th><th></th></tr></thead><tbody><tr><td><span class="sample" style="color:#1f161e;background:#faf6fa">Aa</span></td><td>text<br><code>#1f161e</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">16.47</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#1f161e;background:#ffffff">Aa</span></td><td>text<br><code>#1f161e</code></td><td>surface<br><code>#ffffff</code></td><td class="num">17.62</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#1f161e;background:#f3edf2">Aa</span></td><td>text<br><code>#1f161e</code></td><td>surface-raised<br><code>#f3edf2</code></td><td class="num">15.28</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#1f161e;background:#f3edf2">Aa</span></td><td>text<br><code>#1f161e</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">15.28</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#160d15;background:#faf6fa">Aa</span></td><td>heading<br><code>#160d15</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">17.80</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#160d15;background:#ffffff">Aa</span></td><td>heading<br><code>#160d15</code></td><td>surface<br><code>#ffffff</code></td><td class="num">19.05</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#160d15;background:#f3edf2">Aa</span></td><td>heading<br><code>#160d15</code></td><td>surface-raised<br><code>#f3edf2</code></td><td class="num">16.51</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#160d15;background:#f3edf2">Aa</span></td><td>heading<br><code>#160d15</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">16.51</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#695c67;background:#faf6fa">Aa</span></td><td>muted<br><code>#695c67</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">5.90</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#695c67;background:#ffffff">Aa</span></td><td>muted<br><code>#695c67</code></td><td>surface<br><code>#ffffff</code></td><td class="num">6.31</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#695c67;background:#f3edf2">Aa</span></td><td>muted<br><code>#695c67</code></td><td>surface-raised<br><code>#f3edf2</code></td><td class="num">5.47</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#695c67;background:#f3edf2">Aa</span></td><td>muted<br><code>#695c67</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">5.47</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4804;background:#faf6fa">Aa</span></td><td>accent-text<br><code>#9b4804</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">5.91</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4804;background:#ffffff">Aa</span></td><td>accent-text<br><code>#9b4804</code></td><td>surface<br><code>#ffffff</code></td><td class="num">6.32</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4804;background:#f3edf2">Aa</span></td><td>accent-text<br><code>#9b4804</code></td><td>surface-raised<br><code>#f3edf2</code></td><td class="num">5.48</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4804;background:#f3edf2">Aa</span></td><td>accent-text<br><code>#9b4804</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">5.48</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4d8a;background:#faf6fa">Aa</span></td><td>accent-2-text<br><code>#9b4d8a</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">5.14</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4d8a;background:#ffffff">Aa</span></td><td>accent-2-text<br><code>#9b4d8a</code></td><td>surface<br><code>#ffffff</code></td><td class="num">5.49</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4d8a;background:#f3edf2">Aa</span></td><td>accent-2-text<br><code>#9b4d8a</code></td><td>surface-raised<br><code>#f3edf2</code></td><td class="num">4.76</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4d8a;background:#f3edf2">Aa</span></td><td>accent-2-text<br><code>#9b4d8a</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">4.76</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4804;background:#faf6fa">Aa</span></td><td>link<br><code>#9b4804</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">5.91</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4804;background:#ffffff">Aa</span></td><td>link<br><code>#9b4804</code></td><td>surface<br><code>#ffffff</code></td><td class="num">6.32</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4804;background:#f3edf2">Aa</span></td><td>link<br><code>#9b4804</code></td><td>surface-raised<br><code>#f3edf2</code></td><td class="num">5.48</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4804;background:#f3edf2">Aa</span></td><td>link<br><code>#9b4804</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">5.48</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#7c3602;background:#faf6fa">Aa</span></td><td>link-hover<br><code>#7c3602</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">8.23</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#7c3602;background:#ffffff">Aa</span></td><td>link-hover<br><code>#7c3602</code></td><td>surface<br><code>#ffffff</code></td><td class="num">8.80</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#7c3602;background:#f3edf2">Aa</span></td><td>link-hover<br><code>#7c3602</code></td><td>surface-raised<br><code>#f3edf2</code></td><td class="num">7.63</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#7c3602;background:#f3edf2">Aa</span></td><td>link-hover<br><code>#7c3602</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">7.63</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#177739;background:#faf6fa">Aa</span></td><td>success<br><code>#177739</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">5.26</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#177739;background:#ffffff">Aa</span></td><td>success<br><code>#177739</code></td><td>surface<br><code>#ffffff</code></td><td class="num">5.62</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#177739;background:#f3edf2">Aa</span></td><td>success<br><code>#177739</code></td><td>surface-raised<br><code>#f3edf2</code></td><td class="num">4.88</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#177739;background:#f3edf2">Aa</span></td><td>success<br><code>#177739</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">4.88</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#7e5e01;background:#faf6fa">Aa</span></td><td>warn<br><code>#7e5e01</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">5.63</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#7e5e01;background:#ffffff">Aa</span></td><td>warn<br><code>#7e5e01</code></td><td>surface<br><code>#ffffff</code></td><td class="num">6.02</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#7e5e01;background:#f3edf2">Aa</span></td><td>warn<br><code>#7e5e01</code></td><td>surface-raised<br><code>#f3edf2</code></td><td class="num">5.22</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#7e5e01;background:#f3edf2">Aa</span></td><td>warn<br><code>#7e5e01</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">5.22</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#ac3030;background:#faf6fa">Aa</span></td><td>danger<br><code>#ac3030</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">6.10</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#ac3030;background:#ffffff">Aa</span></td><td>danger<br><code>#ac3030</code></td><td>surface<br><code>#ffffff</code></td><td class="num">6.52</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#ac3030;background:#f3edf2">Aa</span></td><td>danger<br><code>#ac3030</code></td><td>surface-raised<br><code>#f3edf2</code></td><td class="num">5.65</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#ac3030;background:#f3edf2">Aa</span></td><td>danger<br><code>#ac3030</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">5.65</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#2366a4;background:#faf6fa">Aa</span></td><td>info<br><code>#2366a4</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">5.59</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#2366a4;background:#ffffff">Aa</span></td><td>info<br><code>#2366a4</code></td><td>surface<br><code>#ffffff</code></td><td class="num">5.99</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#2366a4;background:#f3edf2">Aa</span></td><td>info<br><code>#2366a4</code></td><td>surface-raised<br><code>#f3edf2</code></td><td class="num">5.19</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#2366a4;background:#f3edf2">Aa</span></td><td>info<br><code>#2366a4</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">5.19</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#1f161e;background:#f3edf2">Aa</span></td><td>code-fg<br><code>#1f161e</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">15.28</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#803a71;background:#f3edf2">Aa</span></td><td>code-accent<br><code>#803a71</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">6.59</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#160d15;background:#f68d31">Aa</span></td><td>on-accent<br><code>#160d15</code></td><td>accent<br><code>#f68d31</code></td><td class="num">7.96</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#160d15;background:#ffb579">Aa</span></td><td>on-accent<br><code>#160d15</code></td><td>accent-hover<br><code>#ffb579</code></td><td class="num">11.01</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#faf6fa;background:#9b4d8a">Aa</span></td><td>on-accent-2<br><code>#faf6fa</code></td><td>accent-2<br><code>#9b4d8a</code></td><td class="num">5.14</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#faf6fa;background:#803a71">Aa</span></td><td>on-accent-2<br><code>#faf6fa</code></td><td>accent-2-hover<br><code>#803a71</code></td><td class="num">7.11</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#1f161e;background:#fed3ae">Aa</span></td><td>selection-fg<br><code>#1f161e</code></td><td>selection-bg<br><code>#fed3ae</code></td><td class="num">12.71</td><td>text ≥ 4.5</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4d8a;background:#faf6fa">Aa</span></td><td>focus<br><code>#9b4d8a</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">5.14</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4d8a;background:#ffffff">Aa</span></td><td>focus<br><code>#9b4d8a</code></td><td>surface<br><code>#ffffff</code></td><td class="num">5.49</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4d8a;background:#f3edf2">Aa</span></td><td>focus<br><code>#9b4d8a</code></td><td>surface-raised<br><code>#f3edf2</code></td><td class="num">4.76</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#887c87;background:#faf6fa">Aa</span></td><td>border-strong<br><code>#887c87</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">3.72</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#887c87;background:#ffffff">Aa</span></td><td>border-strong<br><code>#887c87</code></td><td>surface<br><code>#ffffff</code></td><td class="num">3.98</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#887c87;background:#f3edf2">Aa</span></td><td>border-strong<br><code>#887c87</code></td><td>surface-raised<br><code>#f3edf2</code></td><td class="num">3.45</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4d8a;background:#f3edf2">Aa</span></td><td>focus<br><code>#9b4d8a</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">4.76</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#887c87;background:#f3edf2">Aa</span></td><td>border-strong<br><code>#887c87</code></td><td>code-bg<br><code>#f3edf2</code></td><td class="num">3.45</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4804;background:#faf6fa">Aa</span></td><td>button-edge<br><code>#9b4804</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">5.91</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#9b4804;background:#ffffff">Aa</span></td><td>button-edge<br><code>#9b4804</code></td><td>surface<br><code>#ffffff</code></td><td class="num">6.32</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#662c5a;background:#faf6fa">Aa</span></td><td>button-2-edge<br><code>#662c5a</code></td><td>bg<br><code>#faf6fa</code></td><td class="num">9.47</td><td>ui ≥ 3</td><td>pass</td></tr><tr><td><span class="sample" style="color:#662c5a;background:#ffffff">Aa</span></td><td>button-2-edge<br><code>#662c5a</code></td><td>surface<br><code>#ffffff</code></td><td class="num">10.13</td><td>ui ≥ 3</td><td>pass</td></tr></tbody></table></div></div>
 </main>
 </body>
 </html>

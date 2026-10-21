@@ -7,7 +7,9 @@
  *
  *   dist/css/tokens.css        custom properties: primitives, scales, dark + light roles, reduced motion
  *   dist/css/fonts.css         @font-face for the self-hosted fonts, served from /fonts/
- *   dist/css/frame.css         shared frame pieces: ::selection, :focus-visible, the physical button
+ *   dist/css/frame.css         shared frame pieces: ::selection, :focus-visible, the physical button,
+ *                              and the controls in components/controls.css (fields, checks, switches,
+ *                              segmented controls, tabs, choice cards, copy buttons, menus, tooltips)
  *   dist/css/bridge.css        maps tanuki's (docs) and the current site's --color-* names onto --z-*
  *   dist/scss/_tokens.scss     the same as Sass: $z-* variables, theme maps + mixins, and the custom properties
  *   dist/scss/_fonts.scss      @font-face with a $z-font-path override
@@ -124,6 +126,7 @@ function staticVars(): [string, string][] {
   for (const [k, v] of entries(tokens.radius)) out.push([`radius-${k}`, v as string]);
   for (const [k, v] of entries(tokens.shadow)) out.push([`shadow-${k}`, v as string]);
   for (const [k, v] of entries(tokens.button)) out.push([`button-${k}`, resolve(v as string)]);
+  for (const [k, v] of entries(tokens.control)) out.push([`control-${k}`, resolve(v as string)]);
   for (const [k, v] of entries(tokens.motion)) out.push([k === "lift" ? "lift" : k, v as string]);
   for (const [k, v] of entries(tokens.gradient)) out.push([`gradient-${k}`, resolve(v as string)]);
   return out;
@@ -195,6 +198,11 @@ function fontFaces(base: string): string {
   return out.join("\n\n");
 }
 
+// Control styles live in their own source file so they read as CSS; they are
+// appended to the frame below. Class-scoped (.z-*) only, so a consumer theme
+// (tanuki in the docs) is never restyled by element selectors.
+const CONTROLS_CSS = await Deno.readTextFile("components/controls.css");
+
 const FRAME_CSS = `${CSS_HEADER}
 /* Shared frame for zentinelproxy.io and its docs. Needs tokens.css. */
 
@@ -265,7 +273,8 @@ const FRAME_CSS = `${CSS_HEADER}
   --_edge: var(--z-border-strong);
   --_fg: var(--z-text);
 }
-`;
+
+${CONTROLS_CSS}`;
 
 function buildBridgeCss(): string {
   // tanuki (docs theme) reads these on :root; later rules win at equal specificity,
@@ -449,6 +458,7 @@ p{max-width:var(--z-layout-prose)}
 .fonts{display:grid;gap:var(--z-space-4)}
 .fonts>div{background:var(--z-surface);border:1px solid var(--z-border);border-radius:var(--z-radius-md);padding:var(--z-space-4)}
 .btns{display:flex;flex-wrap:wrap;gap:var(--z-space-4);align-items:center;padding:var(--z-space-4) 0}
+.ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--z-space-4);padding:var(--z-space-4) 0}
 .card{background:var(--z-surface);border:1px solid var(--z-border);border-radius:var(--z-radius-lg);padding:var(--z-space-6);box-shadow:var(--z-shadow-md);margin-top:var(--z-space-4)}
 .code{background:var(--z-code-bg);color:var(--z-code-fg);border:1px solid var(--z-border);border-radius:var(--z-radius-md);padding:var(--z-space-4);overflow-x:auto;font:var(--z-size-sm)/var(--z-leading-code) var(--z-font-mono)}
 .code .k{color:var(--z-accent-text)}.code .s{color:var(--z-code-accent)}.code .c{color:var(--z-muted)}
@@ -512,6 +522,46 @@ ${code}
 <p style="color:var(--z-danger)">danger: request blocked by WAF</p>
 <p style="color:var(--z-info)">info: config reloaded on SIGHUP</p>
 </div>`)}
+
+<h2>Controls</h2>
+<p class="muted">From <code>components/controls.css</code>. Every control takes the focus ring from <code>--z-focus</code>, grows to <code>--z-control-target-min</code> on touch screens, and its transitions drop to zero under reduced motion.</p>
+${pair((t) => `<div class="btns">
+<button class="z-btn z-btn--sm" type="button">Small</button>
+<button class="z-btn" type="button">Medium</button>
+<button class="z-btn z-btn--lg" type="button">Large</button>
+<button class="z-btn z-btn--quiet z-btn--sm" type="button">Quiet</button>
+<button class="z-btn z-btn--ghost z-btn--sm" type="button">Ghost</button>
+<button class="z-btn" type="button" disabled>Disabled</button>
+<button class="z-btn" type="button" aria-busy="true">Running</button>
+</div>
+<div class="ctl">
+<label class="z-field"><span class="z-label">Host</span><input class="z-input" placeholder="example.com"><span class="z-hint">Matched against the Host header.</span></label>
+<label class="z-field"><span class="z-label">Method</span><select class="z-select"><option>GET</option><option>POST</option></select></label>
+<label class="z-field"><span class="z-label">Path</span><input class="z-input z-input--mono" aria-invalid="true" value="api/users"><span class="z-hint z-hint--error">Paths start with /.</span></label>
+<label class="z-field"><span class="z-label">Config</span><textarea class="z-textarea z-textarea--mono" rows="3">system {\n    worker-threads 4\n}</textarea></label>
+</div>
+<div class="btns">
+<label class="z-check-label"><input class="z-check" type="checkbox" checked> WAF</label>
+<label class="z-check-label"><input class="z-check" type="checkbox"> Rate limit</label>
+<label class="z-check-label"><input class="z-check" type="radio" name="r-${t}" checked> Script</label>
+<label class="z-check-label"><input class="z-check" type="radio" name="r-${t}"> Cargo</label>
+<label class="z-check-label"><input class="z-switch" type="checkbox" role="switch" checked> Fail open</label>
+</div>
+<div class="btns">
+<fieldset class="z-segmented"><legend style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Theme</legend><label><input type="radio" name="s-${t}" checked>System</label><label><input type="radio" name="s-${t}">Light</label><label><input type="radio" name="s-${t}">Dark</label></fieldset>
+<div class="z-tabs" role="tablist"><button role="tab" aria-selected="true">Builder</button><button role="tab" aria-selected="false">Raw</button><button role="tab" aria-selected="false">Agents</button></div>
+</div>
+<div class="ctl">
+<label class="z-choice"><input class="z-check" type="radio" name="c-${t}" checked><span><b>Install script</b><br><span class="muted">One-line installer for Linux and macOS</span></span></label>
+<label class="z-choice"><input class="z-check" type="radio" name="c-${t}"><span><b>Cargo</b><br><span class="muted">Build from crates.io</span></span></label>
+</div>
+<div class="btns">
+<button class="z-copy" type="button">Copy</button>
+<button class="z-copy" type="button" data-copied>Copied</button>
+<span class="z-tooltip" tabindex="0" data-tip="Runs the config in your browser">Hover me</span>
+<span><kbd class="z-kbd">Ctrl</kbd> + <kbd class="z-kbd">Enter</kbd></span>
+</div>
+<div class="z-menu" role="menu"><a class="z-menu__item" role="menuitem" href="#controls">Features</a><a class="z-menu__item" role="menuitem" href="#controls" aria-current="page">Playground</a><a class="z-menu__item" role="menuitem" href="#controls">Benchmarks</a></div>`)}
 
 <h2>Typography</h2>
 <p>Display: <b>Unbounded</b>. Text: <b>Atkinson Hyperlegible Next</b>. Mono: <b>Atkinson Hyperlegible Mono</b>. All SIL OFL 1.1, self-hosted from <code>fonts/</code>.</p>
