@@ -26,7 +26,7 @@ themes, and writes Sass partials, CSS custom properties and a preview page to
 so the site and the docs share one palette, one type scale and one button
 while staying two separate Zola sites.
 
-It follows [cyanea-bio/design](https://github.com/cyanea-bio/design): same
+It follows the design repo behind cyanea.bio: same
 `tokens.json` → `build.ts` → committed copies in each consumer, Deno pinned
 through mise. Two differences: the build writes to `dist/` here and a separate
 `sync` step copies into the consumers (so a token change is reviewable in this
@@ -74,9 +74,7 @@ design/
 ## How consumers use it
 
 Each consumer **commits its vendored copy**, the same mechanism cyanea uses
-(`cyanea-bio/design/build.ts` writes `../www/sass/_tokens.scss`,
-`../docs/sass/_tokens.scss` and the app's `tokens.css`; those repos commit the
-files and `@import "tokens"`; no submodule, no package). A consumer therefore
+(no submodule, no package). A consumer therefore
 builds on its own, and Cloudflare Pages never needs this repo.
 
 Check the consumers out next to this repo, then `deno task build && deno task sync`:
@@ -151,6 +149,13 @@ The mark is the shisa mascot, which exists only as a raster illustration. The
 wordmark is vector (outlined Unbounded 700); the lockups are interim (raster
 disc + vector wordmark) until the mascot is redrawn as vector. Details and
 provenance: [`marks/PROVENANCE.md`](marks/PROVENANCE.md).
+
+## Licence
+
+The code and tokens are MIT (see [`LICENSE`](LICENSE)), like the site. The
+fonts are under the SIL Open Font License 1.1; each family's licence file sits
+next to it in `fonts/`. The shisa, the wordmark and the lockups are Zentinel's
+marks: use them to refer to Zentinel, not as the mark of something else.
 
 ---
 

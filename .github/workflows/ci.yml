@@ -1,0 +1,30 @@
+# The contrast gate, plus a check that the committed dist/ is what tokens.json
+# builds to (dist/ is what consumers vendor, so a hand edit there or a token
+# change without a rebuild would ship unreviewed values).
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Contrast gate and dist/ up to date
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: jdx/mise-action@v2
+
+      - name: Contrast gate
+        run: deno task check
+
+      - name: Rebuild and compare with the committed dist/
+        run: |
+          deno task build
+          git diff --exit-code -- dist/
