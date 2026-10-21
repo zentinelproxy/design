@@ -628,6 +628,28 @@
   },
   {
     "theme": "dark",
+    "fg": "focus",
+    "bg": "code-bg",
+    "fgHex": "#d387c1",
+    "bgHex": "#1f161e",
+    "ratio": 6.72,
+    "level": "ui",
+    "min": 3,
+    "pass": true
+  },
+  {
+    "theme": "dark",
+    "fg": "border-strong",
+    "bg": "code-bg",
+    "fgHex": "#887c87",
+    "bgHex": "#1f161e",
+    "ratio": 4.43,
+    "level": "ui",
+    "min": 3,
+    "pass": true
+  },
+  {
+    "theme": "dark",
     "fg": "accent",
     "bg": "bg",
     "fgHex": "#f68d31",
@@ -1290,6 +1312,28 @@
     "theme": "light",
     "fg": "border-strong",
     "bg": "surface-raised",
+    "fgHex": "#887c87",
+    "bgHex": "#f3edf2",
+    "ratio": 3.45,
+    "level": "ui",
+    "min": 3,
+    "pass": true
+  },
+  {
+    "theme": "light",
+    "fg": "focus",
+    "bg": "code-bg",
+    "fgHex": "#9b4d8a",
+    "bgHex": "#f3edf2",
+    "ratio": 4.76,
+    "level": "ui",
+    "min": 3,
+    "pass": true
+  },
+  {
+    "theme": "light",
+    "fg": "border-strong",
+    "bg": "code-bg",
     "fgHex": "#887c87",
     "bgHex": "#f3edf2",
     "ratio": 3.45,

@@ -60,6 +60,8 @@ design/
 │   ├── sync.ts          # vendor dist/ into consumers
 │   ├── marks.ts         # outline the wordmark, build lockups
 │   └── ramps.ts         # derive ramps from #f68d31 / #9b4d8a
+├── components/
+│   └── controls.css     # control styles, appended to frame.css by the build
 ├── fonts/               # WOFF2 + OFL licence files (see fonts/README.md)
 ├── marks/               # sources, wordmark, mark, lockups (see marks/PROVENANCE.md)
 ├── dist/                # GENERATED, committed
@@ -135,6 +137,14 @@ build refuses a mismatch) and, if it is ever text or a UI boundary, to a
   **space** (4 px steps), **layout**, **radius**, **shadow** (tinted per theme).
 - **button**: the family's raised "physical" CTA (`.z-btn` in `frame.css`):
   a hard 4 px edge under the face, lifts to 6 px on hover, presses to 1 px.
+- **control**: heights (sm/md/lg), the 44 px touch target, radius, border,
+  check and switch sizes for the controls in `components/controls.css`
+  (appended to `frame.css`): `.z-input`, `.z-textarea`, `.z-select`,
+  `.z-check` (checkbox/radio), `.z-switch`, `.z-choice` (radio cards),
+  `.z-segmented`, `.z-tabs`, `.z-copy`, `.z-menu`, `.z-tooltip`, `.z-kbd`, and
+  the button sizes and states `.z-btn--sm/--lg/--ghost/--icon`, `:disabled`,
+  `aria-busy="true"` (loading). All class-scoped, so they never restyle a
+  consumer theme by element.
 - **motion** + **reducedMotion**: durations and easings; under
   `prefers-reduced-motion: reduce` durations go to 0 and `--z-lift` to 0, so
   the button keeps its colour feedback and stops moving.
