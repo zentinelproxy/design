@@ -1,0 +1,22 @@
+[tools]
+deno = "2.9.7"
+
+[tasks.build]
+description = "Compile tokens.json into dist/, gate WCAG contrast, write the preview page"
+run = "deno task build"
+
+[tasks.check]
+description = "Run the contrast gate only (no files written)"
+run = "deno task check"
+
+[tasks.sync]
+description = "Copy dist/ and fonts/ into the sibling consumer repos (../zentinelproxy.io, ../zentinelproxy.io-docs)"
+run = "deno task sync"
+
+[tasks.marks]
+description = "Regenerate the outlined wordmark and interim lockups (needs network + ImageMagick)"
+run = "deno task marks"
+
+[tasks.ramps]
+description = "Print the colour ramps derived from the brand accents (does not write tokens.json)"
+run = "deno task ramps"

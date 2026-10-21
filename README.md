@@ -1,0 +1,159 @@
+<p align="center">
+  <a href="https://zentinelproxy.io">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="marks/lockup/zentinel-lockup-dark.svg">
+      <img alt="Zentinel" src="marks/lockup/zentinel-lockup-light.svg" height="52">
+    </picture>
+  </a>
+</p>
+
+<h3 align="center">Zentinel design tokens</h3>
+
+<p align="center">One <code>tokens.json</code> for colour, type, spacing, radius, shadow and motion, compiled for zentinelproxy.io and its docs.</p>
+
+<p align="center">
+  <a href="https://zentinelproxy.io">Website</a> &middot;
+  <a href="https://docs.zentinelproxy.io">Docs</a> &middot;
+  <a href="https://github.com/zentinelproxy">All repositories</a>
+</p>
+
+## What this is
+
+The single source of truth for Zentinel's look. `build.ts` reads `tokens.json`,
+checks every declared text/background pairing against WCAG contrast in both
+themes, and writes Sass partials, CSS custom properties and a preview page to
+`dist/`. `scripts/sync.ts` then vendors those files into the consumer repos,
+so the site and the docs share one palette, one type scale and one button
+while staying two separate Zola sites.
+
+It follows [cyanea-bio/design](https://github.com/cyanea-bio/design): same
+`tokens.json` → `build.ts` → committed copies in each consumer, Deno pinned
+through mise. Two differences: the build writes to `dist/` here and a separate
+`sync` step copies into the consumers (so a token change is reviewable in this
+repo before it lands anywhere), and the build fails on a contrast violation.
+
+## Quickstart
+
+```bash
+mise install              # installs the pinned Deno
+mise run build            # = deno task build: contrast gate, then dist/
+open dist/preview/index.html
+```
+
+| Task | What it does |
+|---|---|
+| `deno task build` | gate contrast, write `dist/` (CSS, Sass, resolved JSON, preview) |
+| `deno task check` | gate contrast only, write nothing (for CI) |
+| `deno task sync` | copy `dist/` + `fonts/` into `../zentinelproxy.io` and `../zentinelproxy.io-docs` |
+| `deno task sync --check` | report consumer copies that are stale, exit 1 if any |
+| `deno task marks` | regenerate the outlined wordmark and interim lockups (network + ImageMagick) |
+| `deno task ramps` | print the colour ramps derived from the brand accents |
+
+## Structure
+
+```
+design/
+├── tokens.json          # the tokens (edit this)
+├── build.ts             # compiler + contrast gate + preview
+├── lib/color.ts         # WCAG contrast, OKLCH conversions
+├── scripts/
+│   ├── sync.ts          # vendor dist/ into consumers
+│   ├── marks.ts         # outline the wordmark, build lockups
+│   └── ramps.ts         # derive ramps from #f68d31 / #9b4d8a
+├── fonts/               # WOFF2 + OFL licence files (see fonts/README.md)
+├── marks/               # sources, wordmark, mark, lockups (see marks/PROVENANCE.md)
+├── dist/                # GENERATED, committed
+│   ├── css/{tokens,fonts,frame,bridge}.css
+│   ├── scss/_{tokens,fonts,frame}.scss
+│   ├── tokens.resolved.json, contrast.json
+│   └── preview/index.html
+├── deno.json
+└── mise.toml
+```
+
+## How consumers use it
+
+Each consumer **commits its vendored copy**, the same mechanism cyanea uses
+(`cyanea-bio/design/build.ts` writes `../www/sass/_tokens.scss`,
+`../docs/sass/_tokens.scss` and the app's `tokens.css`; those repos commit the
+files and `@import "tokens"`; no submodule, no package). A consumer therefore
+builds on its own, and Cloudflare Pages never needs this repo.
+
+Check the consumers out next to this repo, then `deno task build && deno task sync`:
+
+| Consumer | Files it receives | How it loads them |
+|---|---|---|
+| `zentinelproxy.io` (Zola + Sass) | `sass/_tokens.scss`, `sass/_fonts.scss` (replaces the Geist one), `sass/_frame.scss`, `static/fonts/*` | `@import 'tokens'; @import 'fonts'; @import 'frame';` at the top of `sass/style.scss`, then use `var(--z-*)` |
+| `zentinelproxy.io-docs` (Zola + tanuki submodule) | `static/css/zentinel-{fonts,tokens,bridge,frame}.css`, `static/fonts/*` | `<link>` them in that order from the docs' own template override (where `site.css` is linked today), **after** the theme stylesheet. The docs restyle lives in the docs repo as overrides; tanuki is not edited |
+| registry / api (later) | `dist/css/tokens.css` or `dist/tokens.resolved.json` | add an entry to `CONSUMERS` in `scripts/sync.ts` |
+
+`bridge.css` maps the names tanuki reads (`--color-bg`, `--color-accent`,
+`--color-text-muted`, `--color-bg-rgb`, `--font-sans`, …) and the site's
+current names (`--color-primary`, `--color-bg-subtle`) onto `--z-*`, so the
+docs pick up the palette and fonts without forking the theme. tanuki's
+`[data-theme]` attribute on `<html>` drives both.
+
+Never edit a vendored file in a consumer: the next sync overwrites it. A
+consumer CI can run `deno task sync --check` from a checkout of this repo to
+catch drift.
+
+## Changing a token
+
+1. Edit `tokens.json`. Semantic roles and component tokens reference
+   primitives as `{orange.400}`; never put a raw hex in `semantic`.
+2. `deno task build`. If a pairing drops below its minimum the build stops
+   and names it, e.g. `[dark] on-accent-2 #faf6fa on accent-2-hover #b968a7: 3.5:1 < 4.5:1`.
+   Pick another step; do not lower the level.
+3. Open `dist/preview/index.html` and look at both themes.
+4. Commit here (`tokens.json` and `dist/` together), then `deno task sync`
+   and commit the copies in each consumer.
+
+Adding a role: add it to **both** `semantic.dark` and `semantic.light` (the
+build refuses a mismatch) and, if it is ever text or a UI boundary, to a
+`contrast` rule. Retuning a ramp: change the curve in `scripts/ramps.ts`,
+`deno task ramps`, paste over `color`, rebuild. Brand hexes stay pinned
+(`#f68d31` = `orange.400`, `#9b4d8a` = `plum.600`).
+
+## Token structure
+
+- **color**: ramps 50–950 for `orange` (shisa), `plum`, `neutral`
+  (plum-tinted greys, plus `0` white and an `850` raised surface), and
+  `green`/`amber`/`red`/`blue` for status. Derived in OKLCH from the two
+  accents; no Catppuccin values.
+- **semantic.dark / semantic.light**: `bg`, `surface`, `surface-raised`,
+  `border` (decorative), `border-strong` (UI, ≥3:1), `text`, `heading`,
+  `muted`, `accent` (fill) / `accent-hover` / `on-accent` / `accent-text`,
+  the same four for `accent-2`, `link`/`link-hover`, `focus`,
+  `success`/`warn`/`danger`/`info`, `code-bg`/`code-fg`/`code-accent`,
+  `selection-bg`/`selection-fg`, `button-edge`/`button-2-edge`, and
+  `shadow-rgb`. Dark is the default ground; `[data-theme="light"]` or the OS
+  preference switches.
+- **contrast**: the pairings the build checks. 61 per theme today, all
+  passing (lowest text pairing 5.14:1 dark, 4.76:1 light).
+- **font**: Unbounded (display), Atkinson Hyperlegible Next (text),
+  Atkinson Hyperlegible Mono (code), all OFL 1.1. **fontFace** lists the
+  WOFF2 files.
+- **fontSize** (1.25 ratio), **fontWeight**, **lineHeight**, **letterSpacing**,
+  **space** (4 px steps), **layout**, **radius**, **shadow** (tinted per theme).
+- **button**: the family's raised "physical" CTA (`.z-btn` in `frame.css`):
+  a hard 4 px edge under the face, lifts to 6 px on hover, presses to 1 px.
+- **motion** + **reducedMotion**: durations and easings; under
+  `prefers-reduced-motion: reduce` durations go to 0 and `--z-lift` to 0, so
+  the button keeps its colour feedback and stops moving.
+
+Custom properties are prefixed `--z-` (`--z-bg`, `--z-orange-400`,
+`--z-size-xl`); Sass variables `$z-` (`$z-orange-400`, `$z-dark-bg`, maps
+`$z-theme-dark`/`$z-theme-light`, `@include z-theme(light)`).
+
+## Marks
+
+The mark is the shisa mascot, which exists only as a raster illustration. The
+wordmark is vector (outlined Unbounded 700); the lockups are interim (raster
+disc + vector wordmark) until the mascot is redrawn as vector. Details and
+provenance: [`marks/PROVENANCE.md`](marks/PROVENANCE.md).
+
+---
+
+<p align="center">
+  <sub>Part of <a href="https://zentinelproxy.io">Zentinel</a>, the security-first reverse proxy. The shisa guards the gate.</sub>
+</p>

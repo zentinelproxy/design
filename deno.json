@@ -1,0 +1,16 @@
+{
+  "imports": {
+    "opentype.js": "npm:opentype.js@1.3.4",
+    "@std/encoding": "jsr:@std/encoding@1.0.10"
+  },
+  "tasks": {
+    "build": "deno run --allow-read --allow-write build.ts",
+    "check": "deno run --allow-read build.ts --check",
+    "sync": "deno run --allow-read --allow-write scripts/sync.ts",
+    "marks": "deno run --allow-read --allow-write --allow-net=cdn.jsdelivr.net --allow-run=magick scripts/marks.ts",
+    "ramps": "deno run scripts/ramps.ts"
+  },
+  "fmt": {
+    "lineWidth": 110
+  }
+}
