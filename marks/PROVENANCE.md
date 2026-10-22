@@ -21,7 +21,8 @@ them replaces a file listed here. Until the redraw lands:
 | `wordmark/zentinel-wordmark-on-dark.svg` | same, orange-400 `#f68d31` (8.0:1 on the dark ground) | yes |
 | `wordmark/zentinel-wordmark-on-light.svg` | same, orange-700 `#9b4804` (5.9:1 on the light ground; orange-400 is only 2.2:1) | yes |
 | `mark/zentinel-mark-disc-512.png` | the mascot cropped to its plum disc, corners transparent (derived from the 1024 source by `scripts/marks.ts`) | no |
-| `lockup/zentinel-lockup-{dark,light}.svg` | **interim** horizontal lockup: the disc embedded as a 256 px PNG, plus the outlined wordmark | partly |
+| `lockup/zentinel-lockup-{dark,light}.svg` | horizontal lockup: the **machine-traced** vector disc (`candidates/zentinel-mark-colour.svg`, see "Traced candidates") plus the outlined wordmark; about 35 KB. Copied from `candidates/`; rebuild with `candidates/tools/build.sh` | yes (traced) |
+| `lockup/interim/zentinel-lockup-{dark,light}.svg` | the earlier interim lockup: the disc embedded as a 256 px PNG, plus the outlined wordmark (about 119 KB); written by `deno task marks` | partly |
 
 The wordmark is outlined text, not a font reference, so it needs no font on
 the page. `deno task marks` regenerates all of the above.
