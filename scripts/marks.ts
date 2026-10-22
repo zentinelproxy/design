@@ -9,7 +9,7 @@
  *   marks/wordmark/zentinel-wordmark-on-dark.svg    colour, orange-400
  *   marks/wordmark/zentinel-wordmark-on-light.svg   colour, orange-700
  *   marks/mark/zentinel-mark-disc-512.png           mascot disc, transparent corners (raster)
- *   marks/lockup/zentinel-lockup-{dark,light}.svg   INTERIM: raster disc + vector wordmark
+ *   marks/lockup/interim/zentinel-lockup-{dark,light}.svg   INTERIM: raster disc + vector wordmark
  *
  * The shisa itself only exists as a raster illustration (see
  * marks/PROVENANCE.md), so the lockups embed the disc as a PNG. When the
@@ -40,7 +40,7 @@ const shifted = font.getPath(TEXT, -bb.x1, -bb.y1, SIZE, { kerning: true });
 const d = shifted.toPathData(2);
 
 await Deno.mkdir("marks/wordmark", { recursive: true });
-await Deno.mkdir("marks/lockup", { recursive: true });
+await Deno.mkdir("marks/lockup/interim", { recursive: true });
 await Deno.mkdir("marks/mark", { recursive: true });
 
 const credit = `<!-- Zentinel wordmark: "${TEXT}" in Unbounded 700 (SIL OFL 1.1), outlined by design/scripts/marks.ts. Generated; do not edit by hand. -->`;
@@ -84,7 +84,7 @@ const lockup = (textFill: string, label: string) =>
 <path transform="translate(${(markH + gap).toFixed(2)} ${((markH - h) / 2).toFixed(2)})" fill="${textFill}" d="${d}"/>
 </svg>
 `;
-await Deno.writeTextFile("marks/lockup/zentinel-lockup-dark.svg", lockup(C.neutral["50"], "on-dark"));
-await Deno.writeTextFile("marks/lockup/zentinel-lockup-light.svg", lockup(C.neutral["950"], "on-light"));
+await Deno.writeTextFile("marks/lockup/interim/zentinel-lockup-dark.svg", lockup(C.neutral["50"], "on-dark"));
+await Deno.writeTextFile("marks/lockup/interim/zentinel-lockup-light.svg", lockup(C.neutral["950"], "on-light"));
 
 console.log(`wordmark ${w}x${h}, lockup ${W}x${markH.toFixed(2)}; wrote marks/wordmark, marks/mark, marks/lockup`);

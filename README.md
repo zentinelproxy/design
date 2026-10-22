@@ -48,7 +48,7 @@ open dist/preview/index.html
 | `deno task sync --check` | report consumer copies that are stale, exit 1 if any |
 | `deno task sync --check --root <dir>` | the same, with the consumers under `<dir>` (or `DESIGN_CONSUMER_ROOT`) instead of `..` |
 | `deno task sync --check --strict` | also fail when a consumer is not checked out (what CI runs) |
-| `deno task marks` | regenerate the outlined wordmark and interim lockups (network + ImageMagick) |
+| `deno task marks` | regenerate the outlined wordmark and the interim raster lockups in `marks/lockup/interim/` (network + ImageMagick) |
 | `deno task ramps` | print the colour ramps derived from the brand accents |
 
 ## Structure
@@ -223,10 +223,11 @@ Custom properties are prefixed `--z-` (`--z-bg`, `--z-orange-400`,
 
 ## Marks
 
-The mark is the shisa mascot, which exists only as a raster illustration. The
-wordmark is vector (outlined Unbounded 700); the lockups are interim (raster
-disc + vector wordmark) until the mascot is redrawn as vector. Details and
-provenance: [`marks/PROVENANCE.md`](marks/PROVENANCE.md).
+The mark is the shisa mascot, drawn as a raster illustration. The wordmark is
+vector (outlined Unbounded 700). The lockups in `marks/lockup/` use a
+machine-traced vector of the disc, which stands in until a designer redraws the
+mascot; the earlier raster-disc lockups are kept in `marks/lockup/interim/`.
+Details and provenance: [`marks/PROVENANCE.md`](marks/PROVENANCE.md).
 
 ## License
 
